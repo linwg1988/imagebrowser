@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">lib</string>
+    <string name="delete_alert">删除提示</string>
+    <string name="delete_message">是否移除当前图片？</string>
+    <string name="sure">确定</string>
+    <string name="cancel">取消</string>
+</resources>

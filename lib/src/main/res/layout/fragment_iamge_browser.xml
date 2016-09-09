@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical" >
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:background="#252025"
+        android:alpha="0"
+        android:layout_height="match_parent"/>
+
+    <linwg.view.HackyViewPager
+        android:id="@+id/vp_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/ivDownLoad"/>
+
+    <linwg.view.CirclePageIndicator
+        android:id="@+id/indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#9000"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:padding="12dp" />
+
+    <ImageView
+        android:id="@+id/ivDownLoad"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/save_image_selector" />
+
+    <ImageView
+        android:id="@+id/ivDelete"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toLeftOf="@+id/ivDownLoad"
+        android:layout_alignWithParentIfMissing="true"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        android:src="@drawable/lib_delete_selector" />
+
+    <ImageView
+        android:id="@+id/ivCustom"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toLeftOf="@+id/ivDelete"
+        android:visibility="gone"
+        android:layout_alignWithParentIfMissing="true"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/tvCustom"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:visibility="gone"
+        android:layout_toLeftOf="@+id/ivCustom"
+        android:layout_alignWithParentIfMissing="true"/>
+</RelativeLayout>
