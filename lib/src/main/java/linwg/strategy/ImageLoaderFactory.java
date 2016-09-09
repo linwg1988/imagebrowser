@@ -17,7 +17,7 @@ public class ImageLoaderFactory {
 
     public static IImageLoader get() {
         if (ImageLoaderFactory.loader == null)
-            return new GlideLoaderStrategy();
+            loader = new GlideLoaderStrategy();
         return loader;
     }
 }

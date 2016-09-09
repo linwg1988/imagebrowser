@@ -1,6 +1,7 @@
 package o.lin.imagebrowser;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -20,7 +21,9 @@ import org.wglin.imagepicker.ScreenUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import linwg.GlideLoaderStrategy;
 import linwg.ImageBrowser;
+import linwg.strategy.ImageLoaderFactory;
 
 public class MainActivity extends AppCompatActivity implements ImagePicker.OnImagePickerListener{
     ArrayList<String> imageUrls = new ArrayList<>();
@@ -35,15 +38,20 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                 Glide.with(context).load(imgPath).into(targetView);
             }
         });
+        ImageLoaderFactory.set(new GlideLoaderStrategy());
         GridView grid = (GridView) findViewById(R.id.grid);
         baseAdapter = new ImageAdapter();
         grid.setAdapter(baseAdapter);
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ImageBrowser.Builder builder = new ImageBrowser.Builder();
-                builder.urls(imageUrls).targetParent(parent).target(view)
-                        .originIsCenterCrop(true).position(position).build().show(getSupportFragmentManager(),"w");
+                new ImageBrowser.Builder(MainActivity.this)
+                        .urls(imageUrls)
+                        .thumbSize(120)
+                        .targetParent(parent)
+                        .originIsCenterCrop(true)
+                        .position(position)
+                        .show();
             }
         });
     }

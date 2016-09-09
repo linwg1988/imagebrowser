@@ -1,6 +1,7 @@
 package linwg;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -329,6 +331,7 @@ public class ImageBrowser extends DialogFragment {
     }
 
     public static class Builder {
+        private final Context context;
         private int mode = Mode.NONE;
         private ArrayList<String> urls;
         private int position;
@@ -346,7 +349,8 @@ public class ImageBrowser extends DialogFragment {
         private boolean isCenterCrop;
         private View child;
 
-        public Builder() {
+        public Builder(Context context) {
+            this.context = context;
         }
 
         public Builder mode(int mode) {
@@ -560,6 +564,10 @@ public class ImageBrowser extends DialogFragment {
             return new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
         }
 
+        public void show(){
+            ImageBrowser imageBrowser = build();
+            imageBrowser.show(((FragmentActivity)context).getSupportFragmentManager(),"");
+        }
     }
 
     OnDownloadClickListener mOnDownloadClickListener;
