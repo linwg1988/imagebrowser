@@ -6,7 +6,7 @@
 使用方法：
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.0.0'
+    compile 'org.linwg1988:imagebrowser:1.0.1'
 }
 
 为啥写这么一个图片浏览器，一个app的美观程度通常由app中的图片决定的，所以只要不是眼瞎的人都希望app中的
