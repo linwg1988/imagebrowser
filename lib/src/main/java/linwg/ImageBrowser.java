@@ -4,18 +4,17 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.RectF;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 
 import java.util.ArrayList;
 
@@ -38,7 +36,8 @@ import uk.co.senab.photoview.PhotoView;
 /**
  * ImageBrowser Created by wengui on 2016/3/9.
  */
-public class ImageBrowser extends DialogFragment {
+public class ImageBrowser extends Fragment {
+    public static int ANIMATION_DURATION = 250;
     /**
      * The key of the {@link #mode}
      */
@@ -128,10 +127,9 @@ public class ImageBrowser extends DialogFragment {
     private ImageView ivDelete;
     private ImageView ivCustom;
     private TextView tvCustom;
+    private View contentView;
+    private ViewGroup decorView;
 
-    public ImageBrowser() {
-        setStyle(STYLE_NO_FRAME, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-    }
 
     @Nullable
     @Override
@@ -166,18 +164,18 @@ public class ImageBrowser extends DialogFragment {
         }
         screenWidth = Util.getScreenWidth(getActivity());
         screenHeight = Util.getScreenHeight(getActivity());
-        getDialog().setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    viewList.get(position).endAnimation(ImageBrowser.this);
-                    return true;
-                }
-                return false;
-            }
-        });
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        return inflater.inflate(R.layout.fragment_iamge_browser, null);
+
+        contentView = inflater.inflate(R.layout.fragment_iamge_browser, null);
+        initView(contentView);
+        decorView = (ViewGroup) getActivity().getWindow().getDecorView();
+        decorView.addView(contentView);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        decorView.removeView(contentView);
     }
 
     @Override
@@ -195,27 +193,35 @@ public class ImageBrowser extends DialogFragment {
         outState.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
     }
 
+    /**
+     * To make background shadow transparent.
+     * */
     public void playDismissAnimation() {
-        ObjectAnimator.ofFloat(shadowView, "alpha", 0.2f).setDuration(200).start();
+        ObjectAnimator.ofFloat(shadowView, "alpha", 0.1f).setDuration(ANIMATION_DURATION).start();
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void initView(View view) {
         shadowView = view.findViewById(R.id.shadow);
         ivDownLoad = (ImageView) view.findViewById(R.id.ivDownLoad);
         ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
         ivCustom = (ImageView) view.findViewById(R.id.ivCustom);
         tvCustom = (TextView) view.findViewById(R.id.tvCustom);
-        ObjectAnimator.ofFloat(shadowView, "alpha", 1f).setDuration(200).start();
+        ObjectAnimator.ofFloat(shadowView, "alpha", 1f).setDuration(ANIMATION_DURATION).start();
 
         viewList.clear();
         for (int i = 0; i < imageUrls.size(); i++) {
             View imageLayout = getActivity().getLayoutInflater().inflate(R.layout.item_image_browser, null);
             final View iv_thumbnail = imageLayout.findViewById(R.id.iv_thumbnail);
             final ViewGroup.LayoutParams params = iv_thumbnail.getLayoutParams();
-            params.height = thumbSize;
-            params.width = thumbSize;
+            //init thumb size of thumb imageview
+            if (thumbSize == 0) {
+                params.height = (int) rectFs[i].height();
+                params.width = (int) rectFs[i].width();
+            } else {
+                params.height = thumbSize;
+                params.width = thumbSize;
+            }
+
             iv_thumbnail.setLayoutParams(params);
             WrapImageView wrapImageView = new WrapImageView(this, imageLayout, imageUrls.get(i), thumbUrls == null ? null : thumbUrls.get(i),
                     rectFs == null ? null : rectFs[i], i == position, screenWidth, screenHeight, isCenterCrop);
@@ -257,7 +263,7 @@ public class ImageBrowser extends DialogFragment {
                                 public void onClick(DialogInterface dialog, int which) {
                                     removeCurrent();
                                     if (imageUrls.size() == 0) {
-                                        ImageBrowser.this.dismiss();
+                                        ImageBrowser.this.dismissWithoutAnimation();
                                     }
                                     dialog.cancel();
                                 }
@@ -321,6 +327,20 @@ public class ImageBrowser extends DialogFragment {
         final String url = imageUrls.get(position);
         mOnDeleteClickListener.onClick(position, url);
         imagePagerAdapter.notifyDataSetChanged();
+    }
+
+    public static boolean onBackPressed(FragmentActivity activity) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag(TAG);
+        if(fragment != null && fragment instanceof ImageBrowser){
+            return ((ImageBrowser)fragment).onBackPressed();
+        }
+        return false;
+    }
+
+    private boolean onBackPressed() {
+        dismiss();
+        return true;
     }
 
     public static class Mode {
@@ -405,7 +425,7 @@ public class ImageBrowser extends DialogFragment {
          * really moving.But it works bad,so just ignore this method. (ps:HaHa...I just suppose one day I'll make it work,so I didn't delete it.)
          */
         @Deprecated
-        public Builder target(View child) {
+        private Builder target(View child) {
             this.child = child;
             return this;
         }
@@ -547,7 +567,7 @@ public class ImageBrowser extends DialogFragment {
             return imageBrowser;
         }
 
-        private void generateLocations(int childCount){
+        private void generateLocations(int childCount) {
             this.locations = new RectF[childCount];
             for (int i = 0; i < childCount; i++) {
                 int[] locate = new int[2];
@@ -564,10 +584,40 @@ public class ImageBrowser extends DialogFragment {
             return new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
         }
 
-        public void show(){
+        public void show() {
             ImageBrowser imageBrowser = build();
-            imageBrowser.show(((FragmentActivity)context).getSupportFragmentManager(),"");
+            imageBrowser.show(((FragmentActivity) context).getSupportFragmentManager(), "ImageBrowserTag");
         }
+    }
+
+    private static String TAG = "";
+
+    public void show(FragmentManager fragmentManager, String tag) {
+        TAG = tag;
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.add(this, tag);
+        ft.commitAllowingStateLoss();
+    }
+
+    private boolean isDismiss = false;
+
+    public void dismissWithoutAnimation(){
+        onDismiss();
+    }
+
+    public void dismiss() {
+        viewList.get(position).endAnimation(ImageBrowser.this);
+    }
+
+    protected void onDismiss(){
+        if (isDismiss) {
+            return;
+        }
+        isDismiss = true;
+        if (mOnDismissListener != null) {
+            mOnDismissListener.onDismiss();
+        }
+        getFragmentManager().beginTransaction().remove(this).commitAllowingStateLoss();
     }
 
     OnDownloadClickListener mOnDownloadClickListener;
@@ -644,22 +694,6 @@ public class ImageBrowser extends DialogFragment {
         super.onDetach();
         for (WrapImageView view : viewList) {
             view.clean();
-        }
-    }
-
-    @Override
-    public void dismissAllowingStateLoss() {
-        super.dismissAllowingStateLoss();
-        if (mOnDismissListener != null) {
-            mOnDismissListener.onDismiss();
-        }
-    }
-
-    @Override
-    public void dismiss() {
-        super.dismiss();
-        if (mOnDismissListener != null) {
-            mOnDismissListener.onDismiss();
         }
     }
 }

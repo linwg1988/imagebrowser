@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.wglin.imagepicker.ImageLoader;
 import org.wglin.imagepicker.ImagePicker;
@@ -35,11 +36,11 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         ImagePicker.setImageLoader(new ImageLoader() {
             @Override
             public void loadImage(Context context, String imgPath, ImageView targetView) {
-                Glide.with(context).load(imgPath).into(targetView);
+                Glide.with(context).load(imgPath).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).into(targetView);
             }
         });
         ImageLoaderFactory.set(new GlideLoaderStrategy());
-        GridView grid = (GridView) findViewById(R.id.grid);
+        final GridView grid = (GridView) findViewById(R.id.grid);
         baseAdapter = new ImageAdapter();
         grid.setAdapter(baseAdapter);
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -47,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 new ImageBrowser.Builder(MainActivity.this)
                         .urls(imageUrls)
-                        .thumbSize(120)
                         .targetParent(parent)
                         .originIsCenterCrop(true)
                         .position(position)
@@ -103,8 +103,16 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             }
             ImageView img = (ImageView) convertView;
             img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            Glide.with(MainActivity.this).load(imageUrls.get(position)).into(img);
+            Glide.with(MainActivity.this).load(imageUrls.get(position)).asBitmap().into(img);
             return convertView;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(ImageBrowser.onBackPressed(this)){
+            return;
+        }
+        super.onBackPressed();
     }
 }

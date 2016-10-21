@@ -859,7 +859,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
 	private class AnimatedZoomRunnable implements Runnable {
 
-		// These are 'postScale' values, means they're compounded each iteration
+		// These are 'toRectF' values, means they're compounded each iteration
 		static final float ANIMATION_SCALE_PER_ITERATION_IN = 1.07f;
 		static final float ANIMATION_SCALE_PER_ITERATION_OUT = 0.93f;
 

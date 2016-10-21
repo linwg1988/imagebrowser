@@ -2,13 +2,12 @@ package linwg;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
 
-import com.bumptech.glide.DrawableRequestBuilder;
-import com.bumptech.glide.DrawableTypeRequest;
+import com.bumptech.glide.BitmapRequestBuilder;
+import com.bumptech.glide.BitmapTypeRequest;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
@@ -25,20 +24,24 @@ public class GlideLoaderStrategy implements IImageLoader{
         return isLoadingCompleted(view);
     }
 
+    /**
+     * @return if false, the WrapImageView will call {@link #loadThumb(Context, String, String, ImageView, IResourceReadyCallback)} to download thumb image.
+     * */
     @Override
-    public boolean loadThumb(Context context, String originUrl, String thumbUrl, ImageView imageView, final IResourceReadyCallback callback) {
+    public boolean loadThumb(final Context context, String originUrl, String thumbUrl, final ImageView imageView, final IResourceReadyCallback callback) {
         if(thumbUrl == null){
-            DrawableRequestBuilder<String> request = Glide.with(context).load(originUrl).thumbnail(0.1f);
-            request.listener(new RequestListener<String, GlideDrawable>() {
+            BitmapRequestBuilder<String, Bitmap> request = Glide.with(context).load(originUrl).asBitmap().thumbnail(0.1f);
+            request.listener(new RequestListener<String, Bitmap>() {
                 @Override
-                public boolean onException(Exception e, String s, Target<GlideDrawable> target, boolean b) {
+                public boolean onException(Exception e, String s, Target<Bitmap> target, boolean b) {
                     return false;
                 }
 
                 @Override
-                public boolean onResourceReady(GlideDrawable glideDrawable, String s, Target<GlideDrawable> target, boolean b, boolean b1) {
+                public boolean onResourceReady(Bitmap bitmap, String s, Target<Bitmap> target, boolean b, boolean b1) {
+                    imageView.setImageDrawable(new BitmapDrawable(context.getResources(),bitmap));
                     callback.onResourceReady();
-                    return false;
+                    return true;
                 }
             }).into(imageView);
         }else{
@@ -49,26 +52,27 @@ public class GlideLoaderStrategy implements IImageLoader{
 
     @Override
     public Bitmap getBitmapFromImageView(ImageView view) {
-        return ((GlideBitmapDrawable) view.getDrawable()).getBitmap();
+        return ((BitmapDrawable) view.getDrawable()).getBitmap();
     }
 
     private static boolean isLoadingCompleted(ImageView view){
-        return view.getDrawable() == null || !(view.getDrawable() instanceof GlideDrawable);
+        return view.getDrawable() != null;
     }
 
     @Override
-    public void loadImage(Context context, String url, ImageView imageView, final IResourceReadyCallback callback) {
-        DrawableTypeRequest<String> request = Glide.with(context).load(url);
-        request.listener(new RequestListener<String, GlideDrawable>() {
+    public void loadImage(final Context context, String url, final ImageView imageView, final IResourceReadyCallback callback) {
+        BitmapTypeRequest<String> request = Glide.with(context).load(url).asBitmap();
+        request.listener(new RequestListener<String, Bitmap>() {
             @Override
-            public boolean onException(Exception e, String s, Target<GlideDrawable> target, boolean b) {
+            public boolean onException(Exception e, String s, Target<Bitmap> target, boolean b) {
                 return false;
             }
 
             @Override
-            public boolean onResourceReady(GlideDrawable glideDrawable, String s, Target<GlideDrawable> target, boolean b, boolean b1) {
+            public boolean onResourceReady(final Bitmap bitmap, String s, Target<Bitmap> target, boolean b, boolean b1) {
+                imageView.setImageDrawable(new BitmapDrawable(context.getResources(),bitmap));
                 callback.onResourceReady();
-                return false;
+                return true;
             }
         }).into(imageView);
     }
