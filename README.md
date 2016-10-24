@@ -1,7 +1,7 @@
 # imagebrowser
 
 这是一款图片浏览器.</br>
-网上的图片浏览器有很多，大家挑着使用哈。本库供学习使用，若你想用到应用中，我也不会阻拦，哈哈。/<br>
+网上的图片浏览器有很多，大家挑着使用哈。本库供学习使用，若你想用到应用中，我也不会阻拦，哈哈。<br>
 
 话不多说，先看看gradled中的引用：
 ~~~Java
@@ -10,7 +10,9 @@ dependencies {
     compile 'org.linwg1988:imagebrowser:1.0.2'
 }
 
-原先1.0.1版本还是使用 DialogFragment 来实现的，现在改成Fragment实现，相对来说减少了Theme对页面的影响（DialogFrament在显示的时候原始界面的布局可能会上拉），但也增加了一丁点的麻烦，由于需要响应back事件，我们需要在基类Activity中增加判断，代码如下：
+原先1.0.1版本还是使用 DialogFragment 来实现的，现在改成Fragment实现，相对来说减少了Theme对页面的影响<br>
+（DialogFrament在显示的时候原始界面的布局可能会上拉），但也增加了一丁点的麻烦，由于需要响应back事件，<br>
+我们需要在基类Activity中增加判断，代码如下：
 ~~~Java
 @Override
     public void onBackPressed() {
