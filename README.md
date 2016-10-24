@@ -28,42 +28,57 @@ public void onBackPressed() {
 每个开发者使用的图片加载框架不同，或UIL或Glide或Picasso或Fresco,那么提供一个统一的图片加载入口就很有必要了，这里我写的也很简单，<br>
 在程序的入口处设置一个全局的IImageLoader即可：
 ~~~Java
-ImageLoaderFactory.set(new IImageLoader() {...});
+ImageLoaderFactory.set(new IImageLoader() {
+        ...
+    });
 ~~~
 本库默认使用Glide加载图片，所以在库中直接写了这个实现，大家可以照着实现即可：
 ~~~Java
 public class GlideLoaderStrategy implements IImageLoader{
+
     //加载图片，最后一个参数是一个回调，当图片资源加载成功后主动调用，以达到动画缩放位移的效果（ps：回调很重要）
-    void loadImage(Context context, String url, ImageView imageView,IResourceReadyCallback callback){...}
+    void loadImage(Context context, String url, ImageView imageView,IResourceReadyCallback callback){
+        ...
+    }
+    
     //判断图片是否已经成功加载到ImageView中
-    boolean isDrawableLoadingCompleted(ImageView view){...}
+    boolean isDrawableLoadingCompleted(ImageView view){
+        ...
+    }
+    
     //加载缩略图，可以自己实现加载缩略图的方法，并返回true，若果返回false的话，将默认使用loadImage加载缩略图
-    boolean loadThumb(Context context,String originUrl,String thumbUrl,ImageView imageView,IResourceReadyCallback callback){...}
-    //不同图片加载框架获取ImageView上面的Bitmap不太一致，所以将获取Bitmap的方法提取出来（ps：如果你不需要用到浏览器的下载功能的话，
-    可以不实现这个方法）
-    Bitmap getBitmapFromImageView(ImageView view){...}
+    boolean loadThumb(Context context,String originUrl,String thumbUrl,ImageView imageView,
+            IResourceReadyCallback callback){
+        ...
+    }
+    
+    //不同图片加载框架获取ImageView上面的Bitmap不太一致，所以将获取Bitmap的方法提取出来（ps：如果你不需要用到浏览
+    器的下载功能的话，可以不实现这个方法）
+    Bitmap getBitmapFromImageView(ImageView view){
+        ...
+    }
 }
 ~~~
 前戏已近搞定，是不是感觉有点麻烦，哈哈，想高潮前戏还是很重要的嘛~~（老司机开车，新手请跳过），万一你也用Glide，那就可以忽略了嘛。<br>
 接下来是使用图片浏览器了，很简单，一句话搞定：
 ~~~Java
 new ImageBrowser.Builder(MainActivity.this)
-                  .urls(imageUrls)
-                  .thumbUrls(thumbUrls)
-                  .mode(ImageBrowser.Mode.DOWNLOAD)
-                  .setDownloadListener(new ImageBrowser.OnDownloadClickListener() {
-                      @Override
-                      public void onDownloadBtnClick(Bitmap bitmap) {
-                          //TODO DOWNLOAD
-                      }
-                   })
-                   .targetParent(parent)//想要支持动画的话，这个很重要
-                   .thumbSize(120)//缩略图的尺寸，不设值的话会自动检测原始图的大小，如果没有设置targetParent的话则默认100dp
-                   .target(view)//这个暂时先不要用，效果不好
-                   .originIsCenterCrop(true)//重要
-                   .position(position)//起始索引，默认是第一张的话就没必要设置了
-                   .show();
+        .urls(imageUrls)
+        .thumbUrls(thumbUrls)
+        .mode(ImageBrowser.Mode.DOWNLOAD)
+        .setDownloadListener(new ImageBrowser.OnDownloadClickListener() {
+                @Override
+                public void onDownloadBtnClick(Bitmap bitmap) {
+                    //TODO DOWNLOAD
+                }
+            })
+        .targetParent(parent)//想要支持动画的话，这个很重要
+        .thumbSize(120)//缩略图的尺寸，不设值的话会自动检测原始图的大小，如果没有设置targetParent的话则默认100dp
+        .originIsCenterCrop(true)//重要
+        .position(position)//起始索引，默认是第一张的话就没必要设置了
+        .show();
 ~~~
+
 一些参数名言上看过去就明白的我就不再解释了，这里主要说一说重要的几个参数
 
 a)`mode` ：提供了4个模式,默认无操作按钮，<br>
