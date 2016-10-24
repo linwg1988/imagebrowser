@@ -9,7 +9,7 @@ gradle:
 dependencies {
     compile 'org.linwg1988:imagebrowser:1.0.2'
 }
-
+~~~
 原先1.0.1版本还是使用 DialogFragment 来实现的，现在改成Fragment实现，相对来说减少了Theme对页面的影响<br>
 （DialogFrament在显示的时候原始界面的布局可能会上拉），但也增加了一丁点的麻烦，由于需要响应back事件，<br>
 我们需要在基类Activity中增加判断，代码如下：
@@ -21,7 +21,7 @@ dependencies {
         }
         super.onBackPressed();
     }
-
+~~~
 那么，废话也不多说了，如何使用ImageBrowser呢？
 
 首先说一下ImageLoaderFactory和IImageLoader：出于和imagepicker一样的考虑，每个开发者使用的图片加载框架不同，
