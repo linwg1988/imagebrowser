@@ -1,21 +1,24 @@
 # imagebrowser
 
 这是一款图片浏览器.</br>
-网上的图片浏览器千千万，但我只想自己写一款.<br>
+网上的图片浏览器有很多，大家挑着使用哈。本库供学习使用，若你想用到应用中，我也不会阻拦，哈哈。/<br>
 
-使用方法：
+话不多说，先看看gradled中的引用：
 ~~~Java
 gradle:
 dependencies {
     compile 'org.linwg1988:imagebrowser:1.0.2'
 }
 
-为啥写这么一个图片浏览器，一个app的美观程度通常由app中的图片决定的，所以只要不是眼瞎的人都希望app中的
-图片各种赏心悦目，但是一个页面我们能留给图片的位置有限，那么就需要一个图片浏览器来为图片的妖娆提供帮助了。
-
-但是，仅仅提供一个图片查看那也实在无趣，也没必要写这么一个库了，我想网上仔细找一找也找的到，之所以写这么
-一个库，是因为看到了微信WeChat的图片查看，原始图片与浏览器之间的图片是有交互的，就像MD风格那样，如果这个
-库具备这样的效果，那么这个库也许才有一点点吸引其他开发者的地方吧。
+原先1.0.1版本还是使用 DialogFragment 来实现的，现在改成Fragment实现，相对来说减少了Theme对页面的影响（DialogFrament在显示的时候原始界面的布局可能会上拉），但也增加了一丁点的麻烦，由于需要响应back事件，我们需要在基类Activity中增加判断，代码如下：
+~~~Java
+@Override
+    public void onBackPressed() {
+        if(ImageBrowser.onBackPressed(this)){
+            return;
+        }
+        super.onBackPressed();
+    }
 
 那么，废话也不多说了，如何使用ImageBrowser呢？
 
