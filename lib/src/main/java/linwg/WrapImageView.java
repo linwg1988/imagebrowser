@@ -153,6 +153,7 @@ public class WrapImageView {
      * */
     public void startPhotoAnimation() {
         hasPhotoPlaying = true;
+        photoView.preventOnTouchEvent();
         ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", transX * (origin.centerX() - screenWidth / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
         ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", transY * (origin.centerY() - screenHeight / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
         AnimatorSet animatorSet = new AnimatorSet();
@@ -170,6 +171,7 @@ public class WrapImageView {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mProgressBar.setVisibility(View.GONE);
+                photoView.resumeOnTouchEvent();
             }
         });
     }
@@ -178,6 +180,7 @@ public class WrapImageView {
      * Dismiss ImageBrowser with animation.
      * */
     void endAnimation(final ImageBrowser fragment) {
+        photoView.preventOnTouchEvent();
         if (!imageLoader.isDrawableLoadingCompleted(photoView)) {
             endThumbAnimation(fragment);
         } else {

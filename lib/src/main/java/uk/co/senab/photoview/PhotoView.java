@@ -277,4 +277,12 @@ public class PhotoView extends ImageView implements IPhotoView {
         });
         valueAnimator.start();
     }
+
+    public void preventOnTouchEvent() {
+        mAttacher.preventOnTouchEvent();
+    }
+
+    public void resumeOnTouchEvent() {
+        mAttacher.resumeOnTouchEvent();
+    }
 }

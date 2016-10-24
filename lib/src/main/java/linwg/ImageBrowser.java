@@ -37,7 +37,7 @@ import uk.co.senab.photoview.PhotoView;
  * ImageBrowser Created by wengui on 2016/3/9.
  */
 public class ImageBrowser extends Fragment {
-    public static int ANIMATION_DURATION = 250;
+    public static int ANIMATION_DURATION = 1250;
     /**
      * The key of the {@link #mode}
      */
@@ -197,6 +197,10 @@ public class ImageBrowser extends Fragment {
      * To make background shadow transparent.
      * */
     public void playDismissAnimation() {
+        ivCustom.setVisibility(View.GONE);
+        ivDelete.setVisibility(View.GONE);
+        ivDownLoad.setVisibility(View.GONE);
+        tvCustom.setVisibility(View.GONE);
         ObjectAnimator.ofFloat(shadowView, "alpha", 0.1f).setDuration(ANIMATION_DURATION).start();
     }
 

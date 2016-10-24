@@ -140,6 +140,8 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 	private boolean mZoomEnabled;
 	private ScaleType mScaleType = ScaleType.FIT_CENTER;
 
+	private boolean isTouchPrevent;
+
 	public PhotoViewAttacher(ImageView imageView) {
 		mImageView = new WeakReference<ImageView>(imageView);
 
@@ -474,15 +476,17 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 				break;
 			}
 
-			// Check to see if the user double tapped
-			if (null != mGestureDetector && mGestureDetector.onTouchEvent(ev)) {
-				handled = true;
-			}
+			if(!isTouchPrevent){
+				// Check to see if the user double tapped
+				if (null != mGestureDetector && mGestureDetector.onTouchEvent(ev)) {
+					handled = true;
+				}
 
-			// Finally, try the Scale/Drag detector
-			if (null != mScaleDragDetector
-					&& mScaleDragDetector.onTouchEvent(ev)) {
-				handled = true;
+				// Finally, try the Scale/Drag detector
+				if (null != mScaleDragDetector
+						&& mScaleDragDetector.onTouchEvent(ev)) {
+					handled = true;
+				}
 			}
 		}
 
@@ -796,6 +800,14 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 		}
 
 		resetMatrix();
+	}
+
+	public void preventOnTouchEvent() {
+		isTouchPrevent = true;
+	}
+
+	public void resumeOnTouchEvent() {
+		isTouchPrevent = false;
 	}
 
 	/**
