@@ -53,7 +53,7 @@ public class GlideLoaderStrategy implements IImageLoader{
     }
     
     //不同图片加载框架获取ImageView上面的Bitmap不太一致，所以将获取Bitmap的方法提取出来（ps：如果你不需要用到浏览
-    器的下载功能的话，可以不实现这个方法）
+    //器的下载功能的话，可以不实现这个方法）
     Bitmap getBitmapFromImageView(ImageView view){
         ...
     }
@@ -82,10 +82,10 @@ new ImageBrowser.Builder(MainActivity.this)
 一些参数名言上看过去就明白的我就不再解释了，这里主要说一说重要的几个参数
 
 ###a)`mode` <br>
-提供了4个模式,默认无操作按钮，<br>
-`DOWNLOAD`-提供下载按钮，这里实现IImageLoader的getBitmapFromImageView就有必要了；<br>
-`DELETE`-移除按钮，提供移除按钮，仅移除当前浏览器图片，不影响原始容器，如果想移除原始容器的图片，请在回调中处理；<br>
-`CUSTOM`-自定义按钮模式，提供文本和图片按钮，自行设置；<br>
+####提供了4个模式,<br>*NONE*默认无操作按钮，<br>
+*DOWNLOAD*-提供下载按钮，这里实现IImageLoader的getBitmapFromImageView就有必要了；<br>
+*DELETE*-移除按钮，提供移除按钮，仅移除当前浏览器图片，不影响原始容器，如果想移除原始容器的图片，请在回调中处理；<br>
+*CUSTOM*-自定义按钮模式，提供文本和图片按钮，自行设置；<br>
 ###b)`targetParent` <br>
 这个很重要，很重要，很重要，关系到动画效果，这个参数就是你原始图片的父容器，比如说GridView，<br>
 九宫格的图片父容器我想大家应该见得非常多了，没错就是这样的家伙，需要注意的是这个父容器里面的子view个数必须和传入<br>
@@ -94,7 +94,10 @@ new ImageBrowser.Builder(MainActivity.this)
 通常在排列我们原始图片的时候我们为了整齐会将ImageView的ScaleType设置为CENTER_CROP，<br>
 那么这里就必须将originIsCenterCrop设置为true了，以保证最后结束动画的效果，当然如果你使用其他的ScaleType，就请忽略掉这个设置吧；<br>
 
-好了，用法和注意点就是这样了，欢迎大家使用，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...受虐倾向不要太明显...
+好了，用法和注意点就是这样了，欢迎大家使用，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...受虐倾向不要太明显...<br>
+
+最后上一下效果图：<br>
+![](http://ofj4ai6ke.bkt.clouddn.com/video2016_10_24_11_24_13.mp4)
 
 
 
