@@ -100,7 +100,12 @@ new ImageBrowser.Builder(MainActivity.this)
 受虐倾向不要太明显...<br>
 
 最后上一下效果图：<br>
-![](http://ofj4ai6ke.bkt.clouddn.com/effect.gif)
+![](http://ofj4ai6ke.bkt.clouddn.com/local.gif)<br>
+这是加载本地图片的时候<br>
+
+![](http://ofj4ai6ke.bkt.clouddn.com/net.gif)<br>
+这是加载网络图片的时候的效果<br>
+
 
 
 
