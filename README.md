@@ -15,12 +15,12 @@ dependencies {
 我们需要在基类Activity中增加判断，代码如下：
 ~~~Java
 @Override
-    public void onBackPressed() {
-        if(ImageBrowser.onBackPressed(this)){
-            return;
-        }
-        super.onBackPressed();
+public void onBackPressed() {
+    if(ImageBrowser.onBackPressed(this)){
+        return;
     }
+    super.onBackPressed();
+}
 ~~~
 那么，废话也不多说了，如何使用ImageBrowser呢？
 
