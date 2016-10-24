@@ -82,7 +82,8 @@ new ImageBrowser.Builder(MainActivity.this)
 一些参数明眼上看过去就明白的我就不再解释了，这里主要说一说重要的几个参数
 
 ###a)`mode` <br>
-####提供了4个模式,<br>*NONE*默认无操作按钮，<br>
+####提供了4个模式,<br>
+*NONE*-默认无操作按钮，<br>
 *DOWNLOAD*-提供下载按钮，这里实现IImageLoader的getBitmapFromImageView就有必要了；<br>
 *DELETE*-移除按钮，提供移除按钮，仅移除当前浏览器图片，不影响原始容器，如果想移除原始容器的图片，请在回调中处理；<br>
 *CUSTOM*-自定义按钮模式，提供文本和图片按钮，自行设置；<br>
