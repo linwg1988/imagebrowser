@@ -1,12 +1,13 @@
 # imagebrowser
 
-这是一款图片浏览器.
-网上的图片浏览器千千万，但我只想自己写一款~~
+这是一款图片浏览器.</br>
+网上的图片浏览器千千万，但我只想自己写一款.<br>
 
 使用方法：
+~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.0.1'
+    compile 'org.linwg1988:imagebrowser:1.0.2'
 }
 
 为啥写这么一个图片浏览器，一个app的美观程度通常由app中的图片决定的，所以只要不是眼瞎的人都希望app中的
