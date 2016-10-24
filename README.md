@@ -97,7 +97,7 @@ new ImageBrowser.Builder(MainActivity.this)
 好了，用法和注意点就是这样了，欢迎大家使用，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...受虐倾向不要太明显...<br>
 
 最后上一下效果图：<br>
-![](http://ofj4ai6ke.bkt.clouddn.com/gifeffect.gif)
+![](http://ofj4ai6ke.bkt.clouddn.com/effect.gif)
 
 
 
