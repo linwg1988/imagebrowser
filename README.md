@@ -95,7 +95,9 @@ new ImageBrowser.Builder(MainActivity.this)
 通常在排列我们原始图片的时候我们为了整齐会将ImageView的ScaleType设置为CENTER_CROP，<br>
 那么这里就必须将originIsCenterCrop设置为true了，以保证最后结束动画的效果，当然如果你使用其他的ScaleType，就请忽略掉这个设置吧；<br>
 
-好了，用法和注意点就是这样了，欢迎大家使用，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...受虐倾向不要太明显...<br>
+好了，用法和注意点就是这样了，本库中浏览大图使用的控件是开源控件[PhotoView](https://github.com/chrisbanes/PhotoView)，我个人对<br>
+里面的源码做了一定的修改，实现的方式也是效仿PhotoView中对图片的处理。也欢迎大家使，，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...<br>
+受虐倾向不要太明显...<br>
 
 最后上一下效果图：<br>
 ![](http://ofj4ai6ke.bkt.clouddn.com/effect.gif)
