@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.BitmapTypeRequest;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
@@ -30,7 +31,7 @@ public class GlideLoaderStrategy implements IImageLoader{
     @Override
     public boolean loadThumb(final Context context, String originUrl, String thumbUrl, final ImageView imageView, final IResourceReadyCallback callback) {
         if(thumbUrl == null){
-            BitmapRequestBuilder<String, Bitmap> request = Glide.with(context).load(originUrl).asBitmap().thumbnail(0.1f);
+            BitmapRequestBuilder<String, Bitmap> request = Glide.with(context).load(originUrl).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.1f);
             request.listener(new RequestListener<String, Bitmap>() {
                 @Override
                 public boolean onException(Exception e, String s, Target<Bitmap> target, boolean b) {
@@ -61,7 +62,7 @@ public class GlideLoaderStrategy implements IImageLoader{
 
     @Override
     public void loadImage(final Context context, String url, final ImageView imageView, final IResourceReadyCallback callback) {
-        BitmapTypeRequest<String> request = Glide.with(context).load(url).asBitmap();
+        BitmapRequestBuilder<String, Bitmap> request = Glide.with(context).load(url).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL);
         request.listener(new RequestListener<String, Bitmap>() {
             @Override
             public boolean onException(Exception e, String s, Target<Bitmap> target, boolean b) {

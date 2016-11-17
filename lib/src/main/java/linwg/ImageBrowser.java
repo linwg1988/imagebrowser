@@ -338,6 +338,7 @@ public class ImageBrowser extends Fragment {
         tvIndicator.setText(all);
         int px = sp2px(getActivity(), 10);
         sb.setSpan(new AbsoluteSizeSpan(px), c.length(), all.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append("  ");
         sb.append(getDes(position));
         tvDescriptions.setText(sb);
 
@@ -352,6 +353,7 @@ public class ImageBrowser extends Fragment {
                 tvIndicator.setText(all);
                 int px = sp2px(getActivity(), 10);
                 sb.setSpan(new AbsoluteSizeSpan(px), c.length(), all.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sb.append("  ");
                 sb.append(getDes(position));
                 tvDescriptions.setText(sb);
 
@@ -534,6 +536,7 @@ public class ImageBrowser extends Fragment {
 
         /**
          * @param isCenterCrop If the origin imageView's ScaleType is CENTER_CROP, set this true;
+         * @return self
          */
         public Builder originIsCenterCrop(boolean isCenterCrop) {
             this.isCenterCrop = isCenterCrop;

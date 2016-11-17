@@ -60,14 +60,8 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 new ImageBrowser.Builder(MainActivity.this)
                         .urls(baseAdapter.getImageUrls())
-                        .targetParent(parent)
+                        .targetParent(null)
                         .originIsCenterCrop(true)
-                        .setDownloadListener(new ImageBrowser.OnDownloadClickListener() {
-                            @Override
-                            public void onDownloadBtnClick(Bitmap bitmap) {
-
-                            }
-                        })
                         .viewDes(baseAdapter.getImageUrls())
                         .position(position)
                         .show();
