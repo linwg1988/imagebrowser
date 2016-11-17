@@ -14,7 +14,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +41,7 @@ import uk.co.senab.photoview.PhotoView;
  * ImageBrowser Created by wengui on 2016/3/9.
  */
 public class ImageBrowser extends Fragment {
-    public static int ANIMATION_DURATION = 1250;
+    public static int ANIMATION_DURATION = 550;
     /**
      * The key of the {@link #mode}
      */
@@ -50,6 +54,10 @@ public class ImageBrowser extends Fragment {
      * The key of the {@link #imageUrls}
      */
     private static final String IB_URLS = "ib_urls";
+    /**
+     * The key of the {@link #viewDescriptios}
+     */
+    private static final String IB_DES = "ib_des";
     /**
      * The key of the {@link #position}
      */
@@ -94,6 +102,7 @@ public class ImageBrowser extends Fragment {
     private int position;
     private ArrayList<String> imageUrls;
     private ArrayList<String> thumbUrls;
+    private ArrayList<String> viewDescriptios;
     /**
      * The origin viewGroup provide this,if is not null, this array's length is always equals imageView's size.
      */
@@ -129,6 +138,8 @@ public class ImageBrowser extends Fragment {
     private TextView tvCustom;
     private View contentView;
     private ViewGroup decorView;
+    private TextView tvIndicator;
+    private TextView tvDescriptions;
 
 
     @Nullable
@@ -139,6 +150,7 @@ public class ImageBrowser extends Fragment {
             mode = savedInstanceState.getInt(IB_MODE);
             thumbSize = savedInstanceState.getInt(IB_THUMB_SIZE);
             imageUrls = savedInstanceState.getStringArrayList(IB_URLS);
+            viewDescriptios = savedInstanceState.getStringArrayList(IB_DES);
             position = savedInstanceState.getInt(IB_POSITION);
             thumbUrls = savedInstanceState.getStringArrayList(IB_THUMB_URLS);
             rectFs = (RectF[]) savedInstanceState.getParcelableArray(IB_LOCATIONS);
@@ -151,6 +163,7 @@ public class ImageBrowser extends Fragment {
             mode = arguments.getInt(IB_MODE);
             thumbSize = arguments.getInt(IB_THUMB_SIZE);
             imageUrls = arguments.getStringArrayList(IB_URLS);
+            viewDescriptios = arguments.getStringArrayList(IB_DES);
             position = arguments.getInt(IB_POSITION);
             thumbUrls = arguments.getStringArrayList(IB_THUMB_URLS);
             rectFs = (RectF[]) arguments.getParcelableArray(IB_LOCATIONS);
@@ -182,6 +195,7 @@ public class ImageBrowser extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(IB_URLS, imageUrls);
+        outState.putStringArrayList(IB_DES, viewDescriptios);
         outState.putStringArrayList(IB_THUMB_URLS, thumbUrls);
         outState.putInt(IB_POSITION, position);
         outState.putInt(IB_MODE, mode);
@@ -195,7 +209,7 @@ public class ImageBrowser extends Fragment {
 
     /**
      * To make background shadow transparent.
-     * */
+     */
     public void playDismissAnimation() {
         ivCustom.setVisibility(View.GONE);
         ivDelete.setVisibility(View.GONE);
@@ -303,12 +317,44 @@ public class ImageBrowser extends Fragment {
         mViewPager.setAdapter(imagePagerAdapter);
         mViewPager.setCurrentItem(position);
 
+        tvIndicator = (TextView) view.findViewById(R.id.tvIndicator);
+        tvDescriptions = (TextView) view.findViewById(R.id.tvDescriptions);
         circlePageIndicator = (CirclePageIndicator) view.findViewById(R.id.indicator);
+
+        if (viewDescriptios != null && viewDescriptios.size() > 0) {
+            tvDescriptions.setVisibility(View.VISIBLE);
+            tvIndicator.setVisibility(View.GONE);
+            circlePageIndicator.setVisibility(View.GONE);
+        } else {
+            if (imageUrls.size() > 10) {
+                tvIndicator.setVisibility(View.VISIBLE);
+                circlePageIndicator.setVisibility(View.GONE);
+            }
+        }
+
+        String c = String.valueOf(position + 1);
+        String all = c + "/" + String.valueOf(imageUrls.size());
+        SpannableStringBuilder sb = new SpannableStringBuilder(all);
+        tvIndicator.setText(all);
+        int px = sp2px(getActivity(), 10);
+        sb.setSpan(new AbsoluteSizeSpan(px), c.length(), all.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append(getDes(position));
+        tvDescriptions.setText(sb);
+
         circlePageIndicator.setViewPager(mViewPager);
         circlePageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
+                String c = String.valueOf(position + 1);
+                String all = c + "/" + String.valueOf(imageUrls.size());
+                SpannableStringBuilder sb = new SpannableStringBuilder(all);
+                tvIndicator.setText(all);
+                int px = sp2px(getActivity(), 10);
+                sb.setSpan(new AbsoluteSizeSpan(px), c.length(), all.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sb.append(getDes(position));
+                tvDescriptions.setText(sb);
+
                 ImageBrowser.this.position = position;
             }
 
@@ -324,6 +370,19 @@ public class ImageBrowser extends Fragment {
         });
     }
 
+    public static int sp2px(Context context, float spVal) {
+        return (int) TypedValue.applyDimension(2, spVal, context.getResources().getDisplayMetrics());
+    }
+
+    private String getDes(int position) {
+        if (viewDescriptios != null) {
+            if (viewDescriptios.size() > position) {
+                return viewDescriptios.get(position);
+            }
+        }
+        return "";
+    }
+
     /**
      * Remove the current showing imageView and url.
      */
@@ -336,8 +395,8 @@ public class ImageBrowser extends Fragment {
     public static boolean onBackPressed(FragmentActivity activity) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(TAG);
-        if(fragment != null && fragment instanceof ImageBrowser){
-            return ((ImageBrowser)fragment).onBackPressed();
+        if (fragment != null && fragment instanceof ImageBrowser) {
+            return ((ImageBrowser) fragment).onBackPressed();
         }
         return false;
     }
@@ -358,6 +417,7 @@ public class ImageBrowser extends Fragment {
         private final Context context;
         private int mode = Mode.NONE;
         private ArrayList<String> urls;
+        private ArrayList<String> viewDes;
         private int position;
         private ArrayList<String> thumbUrls;
         private int thumbSize;
@@ -401,6 +461,11 @@ public class ImageBrowser extends Fragment {
 
         public Builder urls(ArrayList<String> urls) {
             this.urls = urls;
+            return this;
+        }
+
+        public Builder viewDes(ArrayList<String> viewDes) {
+            this.viewDes = viewDes;
             return this;
         }
 
@@ -545,6 +610,7 @@ public class ImageBrowser extends Fragment {
             final ImageBrowser imageBrowser = new ImageBrowser();
             Bundle bundle = new Bundle();
             bundle.putStringArrayList(IB_URLS, urls);
+            bundle.putStringArrayList(IB_DES, viewDes);
             bundle.putStringArrayList(IB_THUMB_URLS, thumbUrls);
             bundle.putInt(IB_POSITION, position);
             bundle.putInt(IB_MODE, mode);
@@ -605,7 +671,7 @@ public class ImageBrowser extends Fragment {
 
     private boolean isDismiss = false;
 
-    public void dismissWithoutAnimation(){
+    public void dismissWithoutAnimation() {
         onDismiss();
     }
 
@@ -613,7 +679,7 @@ public class ImageBrowser extends Fragment {
         viewList.get(position).endAnimation(ImageBrowser.this);
     }
 
-    protected void onDismiss(){
+    protected void onDismiss() {
         if (isDismiss) {
             return;
         }

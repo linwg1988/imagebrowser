@@ -25,6 +25,28 @@
         android:layout_alignParentBottom="true"
         android:padding="12dp" />
 
+    <TextView
+        android:id="@+id/tvIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#a000"
+        android:layout_gravity="bottom"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:padding="6dp" />
+    <TextView
+        android:id="@+id/tvDescriptions"
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:textColor="#fff"
+        android:textSize="14sp"
+        android:background="#9000"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content" />
+
     <ImageView
         android:id="@+id/ivDownLoad"
         android:layout_width="50dp"

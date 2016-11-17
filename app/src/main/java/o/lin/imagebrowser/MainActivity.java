@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
 
                             }
                         })
+                        .viewDes(baseAdapter.getImageUrls())
                         .position(position)
                         .show();
             }
