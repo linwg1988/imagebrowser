@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -86,6 +87,10 @@ public class ImageBrowser extends Fragment {
      * The key of the {@link #isCenterCrop}
      */
     private static final String IB_IS_ORIGIN_CENTER_CROP = "ib_is_origin_center_crop";
+    /**
+     * The key of the {@link #showTitle}
+     */
+    private static final String IB_SHOW_TITLE = "ib_show_title";
 
     private static final int DEFAULT_THUMB_SIZE = 100;
     /**
@@ -103,6 +108,7 @@ public class ImageBrowser extends Fragment {
     private ArrayList<String> imageUrls;
     private ArrayList<String> thumbUrls;
     private ArrayList<String> viewDescriptios;
+    private boolean showTitle;
     /**
      * The origin viewGroup provide this,if is not null, this array's length is always equals imageView's size.
      */
@@ -139,6 +145,7 @@ public class ImageBrowser extends Fragment {
     private View contentView;
     private ViewGroup decorView;
     private TextView tvIndicator;
+    private TextView tvTitle;
     private TextView tvDescriptions;
 
 
@@ -158,6 +165,7 @@ public class ImageBrowser extends Fragment {
             customTextRes = savedInstanceState.getInt(IB_CUSTOM_TEXT_RES);
             customChar = savedInstanceState.getCharSequence(IB_CUSTOM_TEXT);
             isCenterCrop = savedInstanceState.getBoolean(IB_IS_ORIGIN_CENTER_CROP);
+            showTitle = savedInstanceState.getBoolean(IB_SHOW_TITLE);
         } else {
             final Bundle arguments = getArguments();
             mode = arguments.getInt(IB_MODE);
@@ -171,6 +179,7 @@ public class ImageBrowser extends Fragment {
             customTextRes = arguments.getInt(IB_CUSTOM_TEXT_RES);
             customChar = arguments.getCharSequence(IB_CUSTOM_TEXT);
             isCenterCrop = arguments.getBoolean(IB_IS_ORIGIN_CENTER_CROP);
+            showTitle = arguments.getBoolean(IB_SHOW_TITLE);
         }
         if (thumbSize == 0) {
             thumbSize = (int) Util.dp2px(getActivity(), DEFAULT_THUMB_SIZE);
@@ -205,6 +214,7 @@ public class ImageBrowser extends Fragment {
         outState.putCharSequence(IB_CUSTOM_TEXT, customChar);
         outState.putParcelableArray(IB_LOCATIONS, rectFs);
         outState.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
+        outState.putBoolean(IB_IS_ORIGIN_CENTER_CROP, showTitle);
     }
 
     /**
@@ -318,18 +328,42 @@ public class ImageBrowser extends Fragment {
         mViewPager.setCurrentItem(position);
 
         tvIndicator = (TextView) view.findViewById(R.id.tvIndicator);
+        tvTitle = (TextView) view.findViewById(R.id.tvTitle);
         tvDescriptions = (TextView) view.findViewById(R.id.tvDescriptions);
         circlePageIndicator = (CirclePageIndicator) view.findViewById(R.id.indicator);
+
+        tvTitle.setText(getDes(position));
+
+        if (showTitle) {
+            tvTitle.setVisibility(View.VISIBLE);
+        } else {
+            tvTitle.setVisibility(View.GONE);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int top = dp2px(getActivity(), 25);
+            ViewGroup.LayoutParams lp = tvTitle.getLayoutParams();
+            lp.height += top;
+            tvTitle.setPadding(0, top, 0, 0);
+            tvTitle.requestLayout();
+        }
 
         if (viewDescriptios != null && viewDescriptios.size() > 0) {
             tvDescriptions.setVisibility(View.VISIBLE);
             tvIndicator.setVisibility(View.GONE);
             circlePageIndicator.setVisibility(View.GONE);
         } else {
+            tvDescriptions.setVisibility(View.GONE);
             if (imageUrls.size() > 10) {
                 tvIndicator.setVisibility(View.VISIBLE);
                 circlePageIndicator.setVisibility(View.GONE);
+            } else {
+                tvIndicator.setVisibility(View.GONE);
+                circlePageIndicator.setVisibility(View.VISIBLE);
             }
+        }
+        if(showTitle){
+            tvDescriptions.setVisibility(View.GONE);
         }
 
         String c = String.valueOf(position + 1);
@@ -347,6 +381,7 @@ public class ImageBrowser extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
+                tvTitle.setText(getDes(position));
                 String c = String.valueOf(position + 1);
                 String all = c + "/" + String.valueOf(imageUrls.size());
                 SpannableStringBuilder sb = new SpannableStringBuilder(all);
@@ -370,6 +405,10 @@ public class ImageBrowser extends Fragment {
 
             }
         });
+    }
+
+    public static int dp2px(Context context, float dpVal) {
+        return (int) TypedValue.applyDimension(1, dpVal, context.getResources().getDisplayMetrics());
     }
 
     public static int sp2px(Context context, float spVal) {
@@ -434,6 +473,7 @@ public class ImageBrowser extends Fragment {
         private CharSequence customChar;
         private boolean isCenterCrop;
         private View child;
+        private boolean showTitle;
 
         public Builder(Context context) {
             this.context = context;
@@ -458,6 +498,11 @@ public class ImageBrowser extends Fragment {
                 thumbUrls = new ArrayList<>();
             thumbUrls.clear();
             thumbUrls.add(thumbUrl);
+            return this;
+        }
+
+        public Builder showTitle(boolean showTitle) {
+            this.showTitle = showTitle;
             return this;
         }
 
@@ -621,6 +666,7 @@ public class ImageBrowser extends Fragment {
             bundle.putInt(IB_CUSTOM_IMG_RES, customImgRes);
             bundle.putInt(IB_CUSTOM_TEXT_RES, customTextRes);
             bundle.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
+            bundle.putBoolean(IB_SHOW_TITLE, showTitle);
             bundle.putCharSequence(IB_CUSTOM_TEXT, customChar);
             bundle.putParcelableArray(IB_LOCATIONS, locations);
             imageBrowser.setArguments(bundle);
