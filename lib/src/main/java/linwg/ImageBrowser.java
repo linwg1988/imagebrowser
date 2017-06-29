@@ -149,6 +149,7 @@ public class ImageBrowser extends Fragment {
     private TextView tvDescriptions;
 
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -447,6 +448,21 @@ public class ImageBrowser extends Fragment {
         return true;
     }
 
+    public boolean onLongClick(WrapImageView wrapImageView) {
+        if(l != null){
+            int position = viewList.indexOf(wrapImageView);
+            l.handlerLongClick(position);
+            return true;
+        }
+        return false;
+    }
+
+    OnPhotoLongClickListener l;
+
+    public interface OnPhotoLongClickListener{
+        void handlerLongClick(int position);
+    }
+
     public static class Mode {
         public static final int NONE = -1;
         public static final int DOWNLOAD = -2;
@@ -455,6 +471,7 @@ public class ImageBrowser extends Fragment {
     }
 
     public static class Builder {
+        OnPhotoLongClickListener l;
         private final Context context;
         private int mode = Mode.NONE;
         private ArrayList<String> urls;
@@ -518,6 +535,11 @@ public class ImageBrowser extends Fragment {
 
         public Builder thumbUrls(ArrayList<String> thumbUrls) {
             this.thumbUrls = thumbUrls;
+            return this;
+        }
+
+        public Builder photoLongClickListener(OnPhotoLongClickListener l){
+            this.l = l;
             return this;
         }
 
@@ -674,6 +696,7 @@ public class ImageBrowser extends Fragment {
             imageBrowser.setOnDeleteClickListener(this.deleteListener);
             imageBrowser.setOnCustomImgClickListener(this.customImgListener);
             imageBrowser.setOnCustomTxtClickListener(this.customTxtListener);
+            imageBrowser.setOnLongClickListener(l);
             if (child != null) {
                 child.setAlpha(0.2f);
                 imageBrowser.setOnDismissListener(new OnDismissListener() {
@@ -707,6 +730,10 @@ public class ImageBrowser extends Fragment {
             ImageBrowser imageBrowser = build();
             imageBrowser.show(((FragmentActivity) context).getSupportFragmentManager(), "ImageBrowserTag");
         }
+    }
+
+    private void setOnLongClickListener(OnPhotoLongClickListener l) {
+        this.l = l;
     }
 
     private static String TAG = "";

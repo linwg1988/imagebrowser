@@ -72,6 +72,13 @@ public class WrapImageView {
                 browser.dismiss();
             }
         });
+
+        photoView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return browser.onLongClick(WrapImageView.this);
+            }
+        });
     }
 
     public void startLoading() {
