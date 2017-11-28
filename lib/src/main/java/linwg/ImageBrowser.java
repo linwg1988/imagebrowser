@@ -451,7 +451,7 @@ public class ImageBrowser extends Fragment {
     public boolean onLongClick(WrapImageView wrapImageView) {
         if(l != null){
             int position = viewList.indexOf(wrapImageView);
-            l.handlerLongClick(position);
+            l.handlerLongClick(this,position);
             return true;
         }
         return false;
@@ -460,7 +460,7 @@ public class ImageBrowser extends Fragment {
     OnPhotoLongClickListener l;
 
     public interface OnPhotoLongClickListener{
-        void handlerLongClick(int position);
+        void handlerLongClick(ImageBrowser browser,int position);
     }
 
     public static class Mode {

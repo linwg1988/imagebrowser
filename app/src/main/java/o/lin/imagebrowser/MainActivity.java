@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.wglin.imagepicker.ImageLoader;
 import org.wglin.imagepicker.ImagePicker;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         ImagePicker.setImageLoader(new ImageLoader() {
             @Override
             public void loadImage(Context context, String imgPath, ImageView targetView) {
-                Glide.with(context).load(imgPath).asBitmap().diskCacheStrategy(DiskCacheStrategy.ALL).into(targetView);
+                Glide.with(context).load(imgPath).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)).into(targetView);
             }
         });
         ImageLoaderFactory.set(new GlideLoaderStrategy());
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             }
             ImageView img = (ImageView) convertView;
             img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            Glide.with(context).load(imageUrls.get(position)).asBitmap().into(img);
+            Glide.with(context).load(imageUrls.get(position)).into(img);
             return convertView;
         }
     }

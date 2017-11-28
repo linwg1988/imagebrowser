@@ -7,7 +7,7 @@
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.0.5'
+    compile 'org.linwg1988:imagebrowser:1.0.8'
 }
 ~~~
 原先1.0.1版本还是使用 DialogFragment 来实现的，现在改成Fragment实现，相对来说减少了Theme对页面的影响<br>
