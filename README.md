@@ -7,11 +7,11 @@
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.0.8'
+    compile 'org.linwg1988:imagebrowser:1.1.0'
 }
 ~~~
-原先1.0.1版本还是使用 DialogFragment 来实现的，现在改成Fragment实现，相对来说减少了Theme对页面的影响<br>
-（DialogFrament在显示的时候原始界面的布局可能会上拉），但也增加了一丁点的麻烦，由于需要响应back事件，<br>
+已经更新到了1.1.0版本，这个版本相对以前来说支持了RecyclerView的列表，并且在相对复杂的列表子项中提供<br>
+ImageView的id配置，使图片的初始位置更加精确，过渡动画更加友好。由于需要响应back事件，<br>
 我们需要在基类Activity中增加判断，代码如下：
 ~~~Java
 @Override
@@ -91,9 +91,13 @@ new ImageBrowser.Builder(MainActivity.this)
 这个很重要，很重要，很重要，关系到动画效果，这个参数就是你原始图片的父容器，比如说GridView，<br>
 九宫格的图片父容器我想大家应该见得非常多了，没错就是这样的家伙，需要注意的是这个父容器里面的子view个数必须和传入<br>
 的url数目一致（AdapterView的话适配器中的getCount()返回值必须和url的数目一致），否则动画效果难以保证；<br>
-###c)`originIsCenterCrop` <br>
+###c)`imageViewId` <br>
+新增！这个参数是实际列表控件中ImageView控件的id，有时候列表项有间隙或其它子项的时候，设置这个id将使图片的原始位置更加精确；<br>
+###d)`originIsCenterCrop` <br>
 通常在排列我们原始图片的时候我们为了整齐会将ImageView的ScaleType设置为CENTER_CROP，<br>
 那么这里就必须将originIsCenterCrop设置为true了，以保证最后结束动画的效果，当然如果你使用其他的ScaleType，就请忽略掉这个设置吧；<br>
+###e)`linkage` <br>
+新增！此参数设置为true时，图片浏览器与外层的列表控件将形成联动，需要注意的是targetParent和imageViewId必须同时设置才能起到作用；<br>
 
 好了，用法和注意点就是这样了，本库中浏览大图使用的控件是开源控件[PhotoView](https://github.com/chrisbanes/PhotoView)，我个人对<br>
 里面的源码做了一定的修改，实现的方式也是效仿PhotoView中对图片的处理。也欢迎大家使，，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...<br>

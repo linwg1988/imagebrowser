@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +17,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -147,7 +152,7 @@ public class ImageBrowser extends Fragment {
     private TextView tvIndicator;
     private TextView tvTitle;
     private TextView tvDescriptions;
-
+    private Builder builder;
 
 
     @Nullable
@@ -363,7 +368,7 @@ public class ImageBrowser extends Fragment {
                 circlePageIndicator.setVisibility(View.VISIBLE);
             }
         }
-        if(showTitle){
+        if (showTitle) {
             tvDescriptions.setVisibility(View.GONE);
         }
 
@@ -394,6 +399,26 @@ public class ImageBrowser extends Fragment {
                 tvDescriptions.setText(sb);
 
                 ImageBrowser.this.position = position;
+                if (builder != null && builder.linkage && rectFs != null) {
+                    RectF rectF = rectFs[position];
+                    int[] parentLocation = new int[2];
+                    builder.parent.getLocationOnScreen(parentLocation);
+                    RectF parentRectF = new RectF(parentLocation[0], parentLocation[1], parentLocation[0] + builder.parent.getWidth(), parentLocation[1] + builder.parent.getHeight());
+                    if (rectF.bottom > parentRectF.bottom) {
+                        float offset = rectF.bottom - parentRectF.bottom - builder.viewRectFInfo.bottomOffset;
+                        for (int i = 0; i < rectFs.length; i++) {
+                            rectFs[i].offset(0, -offset);
+                        }
+                        performScrollToBottom(builder.parent, offset, position);
+                    }
+                    if (rectF.top < parentRectF.top) {
+                        float offset = parentRectF.top - rectF.top + builder.viewRectFInfo.topOffset;
+                        for (int i = 0; i < rectFs.length; i++) {
+                            rectFs[i].offset(0, offset);
+                        }
+                        performScrollToTop(builder.parent, offset, position);
+                    }
+                }
             }
 
             @Override
@@ -406,6 +431,24 @@ public class ImageBrowser extends Fragment {
 
             }
         });
+    }
+
+    private void performScrollToBottom(ViewGroup parent, float offset, int position) {
+        if (parent instanceof AbsListView) {
+            AbsListViewHelper.performScrollToBottom((AbsListView) parent,offset,position);
+        } else if (parent instanceof RecyclerView) {
+            RecyclerViewHelper.performScrollToBottom((RecyclerView) parent,offset,position);
+        }else{
+
+        }
+    }
+
+    private void performScrollToTop(ViewGroup parent, float offset, int position) {
+        if (parent instanceof AbsListView) {
+            AbsListViewHelper.performScrollToTop((AbsListView) parent,offset,position);
+        } else if (parent instanceof RecyclerView) {
+            RecyclerViewHelper.performScrollToTop((RecyclerView) parent,offset,position);
+        }
     }
 
     public static int dp2px(Context context, float dpVal) {
@@ -449,9 +492,9 @@ public class ImageBrowser extends Fragment {
     }
 
     public boolean onLongClick(WrapImageView wrapImageView) {
-        if(l != null){
+        if (l != null) {
             int position = viewList.indexOf(wrapImageView);
-            l.handlerLongClick(this,position);
+            l.handlerLongClick(this, position);
             return true;
         }
         return false;
@@ -459,8 +502,12 @@ public class ImageBrowser extends Fragment {
 
     OnPhotoLongClickListener l;
 
-    public interface OnPhotoLongClickListener{
-        void handlerLongClick(ImageBrowser browser,int position);
+    public void setBuilder(Builder builder) {
+        this.builder = builder;
+    }
+
+    public interface OnPhotoLongClickListener {
+        void handlerLongClick(ImageBrowser browser, int position);
     }
 
     public static class Mode {
@@ -479,8 +526,14 @@ public class ImageBrowser extends Fragment {
         private int position;
         private ArrayList<String> thumbUrls;
         private int thumbSize;
-        RectF[] locations;
+        //        RectF[] imgLocations;
         ViewGroup parent;
+        ViewRectFInfo viewRectFInfo;
+        int imageViewId;
+        //        float leftOffset;
+//        float topOffset;
+//        float bottomOffset;
+//        float rightOffset;
         private OnDownloadClickListener downloadListener;
         private OnDeleteClickListener deleteListener;
         private View.OnClickListener customImgListener;
@@ -491,6 +544,7 @@ public class ImageBrowser extends Fragment {
         private boolean isCenterCrop;
         private View child;
         private boolean showTitle;
+        boolean linkage;
 
         public Builder(Context context) {
             this.context = context;
@@ -533,12 +587,17 @@ public class ImageBrowser extends Fragment {
             return this;
         }
 
+        public Builder linkage(boolean linkage) {
+            this.linkage = linkage;
+            return this;
+        }
+
         public Builder thumbUrls(ArrayList<String> thumbUrls) {
             this.thumbUrls = thumbUrls;
             return this;
         }
 
-        public Builder photoLongClickListener(OnPhotoLongClickListener l){
+        public Builder photoLongClickListener(OnPhotoLongClickListener l) {
             this.l = l;
             return this;
         }
@@ -555,6 +614,11 @@ public class ImageBrowser extends Fragment {
 
         public Builder targetParent(ViewGroup parent) {
             this.parent = parent;
+            return this;
+        }
+
+        public Builder imageViewId(@IdRes int imageViewId) {
+            this.imageViewId = imageViewId;
             return this;
         }
 
@@ -612,69 +676,17 @@ public class ImageBrowser extends Fragment {
 
         public ImageBrowser build() {
             if (parent != null) {
-                final int childCount = parent.getChildCount();
-                if (parent instanceof AbsListView) {
-                    int count = ((AbsListView) parent).getAdapter().getCount();
-                    int numColumns = 0;
-                    if (parent instanceof GridView) {
-                        numColumns = ((GridView) parent).getNumColumns();
-                    } else if (parent instanceof ListView) {
-                        numColumns = 1;
-                    }
-
-                    if (count > childCount) {
-                        this.locations = new RectF[count];
-                        int firstVisiblePosition = ((AbsListView) parent).getFirstVisiblePosition();
-                        int lastVisiblePosition = ((AbsListView) parent).getLastVisiblePosition();
-                        if (lastVisiblePosition + 1 - firstVisiblePosition != childCount) {
-                            throw new IllegalArgumentException("The parent view is an AbsListView,but the adapter does not make items recycling.");
-                        }
-
-                        RectF firstChildRectF = getRectFByIndex(parent, 0);
-                        RectF lastChildRectF = getRectFByIndex(parent, childCount - 1);
-                        int overLineCount = firstVisiblePosition / numColumns;
-                        for (int i = 0; i < firstVisiblePosition; i++) {
-                            int columnIndex = i % numColumns;
-                            RectF rectF = new RectF();
-                            rectF.left = firstChildRectF.left + columnIndex * firstChildRectF.width();
-                            rectF.right = firstChildRectF.right + columnIndex * firstChildRectF.width();
-                            rectF.top = firstChildRectF.top - firstChildRectF.height() * overLineCount;
-                            rectF.bottom = firstChildRectF.bottom - firstChildRectF.height() * overLineCount;
-                            if (i != 0 && columnIndex == 0) {
-                                overLineCount--;
-                            }
-                            locations[i] = rectF;
-                        }
-                        for (int i = firstVisiblePosition; i < lastVisiblePosition + 1; i++) {
-                            int[] locate = new int[2];
-                            final View child = parent.getChildAt(i - firstVisiblePosition);
-                            child.getLocationOnScreen(locate);
-                            RectF rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
-                            locations[i] = rectF;
-                        }
-
-                        int futureLineCount = 0;
-                        for (int i = lastVisiblePosition + 1; i < count; i++) {
-                            int columnIndex = i % numColumns;
-                            if (columnIndex == 0) {
-                                futureLineCount++;
-                            }
-                            RectF rectF = new RectF();
-                            rectF.left = lastChildRectF.left - (numColumns - columnIndex - 1) * firstChildRectF.width();
-                            rectF.right = lastChildRectF.right - (numColumns - columnIndex - 1) * firstChildRectF.width();
-                            rectF.top = lastChildRectF.top + lastChildRectF.height() * futureLineCount;
-                            rectF.bottom = lastChildRectF.bottom + lastChildRectF.height() * futureLineCount;
-                            locations[i] = rectF;
-                        }
-                    } else {
-                        generateLocations(childCount);
-                    }
+                if (parent instanceof RecyclerView) {
+                    viewRectFInfo = RecyclerViewHelper.measureChild((RecyclerView) parent, imageViewId);
+                } else if (parent instanceof AbsListView) {
+                    viewRectFInfo = AbsListViewHelper.measureChild((AbsListView) parent, imageViewId);
                 } else {
-                    generateLocations(childCount);
+                    viewRectFInfo = ViewGroupHelper.measureChild(parent, imageViewId);
                 }
             }
-            if (thumbSize == 0 && locations != null) {
-                thumbSize = (int) locations[0].width();
+
+            if (thumbSize == 0 && viewRectFInfo != null && viewRectFInfo.imgLocations != null) {
+                thumbSize = (int) viewRectFInfo.imgLocations[0].width();
             }
 
             final ImageBrowser imageBrowser = new ImageBrowser();
@@ -690,8 +702,9 @@ public class ImageBrowser extends Fragment {
             bundle.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
             bundle.putBoolean(IB_SHOW_TITLE, showTitle);
             bundle.putCharSequence(IB_CUSTOM_TEXT, customChar);
-            bundle.putParcelableArray(IB_LOCATIONS, locations);
+            bundle.putParcelableArray(IB_LOCATIONS, viewRectFInfo.imgLocations);
             imageBrowser.setArguments(bundle);
+            imageBrowser.setBuilder(this);
             imageBrowser.setOnDownloadClickListener(this.downloadListener);
             imageBrowser.setOnDeleteClickListener(this.deleteListener);
             imageBrowser.setOnCustomImgClickListener(this.customImgListener);
@@ -707,23 +720,6 @@ public class ImageBrowser extends Fragment {
                 });
             }
             return imageBrowser;
-        }
-
-        private void generateLocations(int childCount) {
-            this.locations = new RectF[childCount];
-            for (int i = 0; i < childCount; i++) {
-                int[] locate = new int[2];
-                final View child = parent.getChildAt(i);
-                child.getLocationOnScreen(locate);
-                locations[i] = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
-            }
-        }
-
-        private RectF getRectFByIndex(ViewGroup parent, int i) {
-            int[] locate = new int[2];
-            final View child = parent.getChildAt(i);
-            child.getLocationOnScreen(locate);
-            return new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
         }
 
         public void show() {
@@ -752,6 +748,11 @@ public class ImageBrowser extends Fragment {
     }
 
     public void dismiss() {
+        shadowView.animate().alpha(0).setDuration(250).start();
+        tvIndicator.animate().translationY(tvIndicator.getHeight()).setDuration(250).start();
+        tvTitle.animate().translationY(-tvTitle.getHeight()).setDuration(250).start();
+        circlePageIndicator.animate().translationY(circlePageIndicator.getHeight()).setDuration(250).start();
+        tvDescriptions.animate().alpha(0).setDuration(250).start();
         viewList.get(position).endAnimation(ImageBrowser.this);
     }
 
