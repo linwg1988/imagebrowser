@@ -197,6 +197,14 @@ public class ImageBrowser extends Fragment {
         contentView = inflater.inflate(R.layout.fragment_iamge_browser, null);
         initView(contentView);
         decorView = (ViewGroup) getActivity().getWindow().getDecorView();
+        if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.M){
+            int systemWindowInsetBottom = decorView.getRootWindowInsets().getSystemWindowInsetBottom();
+            if(systemWindowInsetBottom != 0 && rectFs != null){
+                for(int i=0;i<rectFs.length;i++){
+                    rectFs[i].offset(0,-systemWindowInsetBottom/2);
+                }
+            }
+        }
         decorView.addView(contentView);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -419,14 +427,6 @@ public class ImageBrowser extends Fragment {
                         performScrollToTop(builder.parent, offset, position);
                     }
                 }
-                if(builder != null&& builder.child != null && builder.parent != null){
-                    builder.parent.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            builder.changeChild(position);
-                        }
-                    });
-                }
             }
 
             @Override
@@ -526,6 +526,8 @@ public class ImageBrowser extends Fragment {
 
     public interface OnShowingClickListener {
         void onShowing();
+
+        void onChildChange(int position);
     }
 
     public static class Mode {
@@ -743,6 +745,11 @@ public class ImageBrowser extends Fragment {
                     public void onShowing() {
                         child.setAlpha(0.0f);
                     }
+
+                    @Override
+                    public void onChildChange(int position) {
+                        changeChild(position);
+                    }
                 });
             }
             return imageBrowser;
@@ -797,6 +804,9 @@ public class ImageBrowser extends Fragment {
         tvTitle.animate().translationY(-tvTitle.getHeight()).setDuration(250).start();
         circlePageIndicator.animate().translationY(circlePageIndicator.getHeight()).setDuration(250).start();
         tvDescriptions.animate().alpha(0).setDuration(250).start();
+        if(mOnShowingClickListener != null){
+            mOnShowingClickListener.onChildChange(position);
+        }
         viewList.get(position).endAnimation(ImageBrowser.this);
     }
 

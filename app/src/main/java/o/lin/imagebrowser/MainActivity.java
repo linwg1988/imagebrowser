@@ -1,8 +1,12 @@
 package o.lin.imagebrowser;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -197,7 +201,33 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     }
 
     public void pickImage(View view) {
-        new ImagePicker.Builder().maxPictureNumber(99).build().show(getSupportFragmentManager(), "imagePicker");
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},123);
+        }else{
+            new ImagePicker.Builder().maxPictureNumber(99).build().show(getSupportFragmentManager(), "imagePicker");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 123){
+            List<String> deniedPermissions = new ArrayList<>();
+            for (int i = 0; i < grantResults.length; i++)
+            {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
+                {
+                    deniedPermissions.add(permissions[i]);
+                }
+            }
+            if (deniedPermissions.size() > 0)
+            {
+                Toast.makeText(this,"获取权限失败",Toast.LENGTH_SHORT).show();
+            } else
+            {
+                new ImagePicker.Builder().maxPictureNumber(99).build().show(getSupportFragmentManager(), "imagePicker");
+            }
+        }
     }
 
     @Override
