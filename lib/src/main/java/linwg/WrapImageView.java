@@ -41,10 +41,11 @@ public class WrapImageView {
     private boolean hasPhotoPlaying;
     boolean isCenterCrop;
     boolean isOriginMiss;
-
+    ImageBrowser mImageBrowser;
     WrapImageView(final ImageBrowser browser, View targetView, String url, String thumbUrl, RectF origin,
                   boolean isStartView, int screenWidth, int screenHeight, boolean isCenterCrop) {
         imageLoader = ImageLoaderFactory.get();
+        this.mImageBrowser = browser;
         this.isCenterCrop = isCenterCrop;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
@@ -207,6 +208,7 @@ public class WrapImageView {
                 }
             });
         }
+        mImageBrowser.onResourceReady();
     }
 
     /**

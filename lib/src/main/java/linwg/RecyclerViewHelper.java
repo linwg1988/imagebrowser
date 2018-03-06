@@ -141,4 +141,8 @@ class RecyclerViewHelper {
     public static void performScrollToTop(RecyclerView parent, float offset, int position) {
         parent.scrollToPosition(position);
     }
+
+    public static View findChildByPosition(RecyclerView parent, int imageViewId, int position) {
+        return parent.getLayoutManager().findViewByPosition(position).findViewById(imageViewId);
+    }
 }

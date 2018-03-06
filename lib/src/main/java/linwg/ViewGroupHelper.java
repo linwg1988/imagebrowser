@@ -28,4 +28,9 @@ class ViewGroupHelper {
         }
         return viewRectFInfo;
     }
+
+    public static View findChildByPosition(ViewGroup parent, int imageViewId, int position) {
+        View child = parent.getChildAt(position);
+        return child == null ? null : child.findViewById(imageViewId);
+    }
 }

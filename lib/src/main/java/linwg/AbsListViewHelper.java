@@ -138,4 +138,9 @@ class AbsListViewHelper {
     public static void performScrollToTop(AbsListView parent, float offset, int position) {
         parent.smoothScrollBy((int) -offset,0);
     }
+
+    public static View findChildByPosition(AbsListView parent, int imageViewId, int position) {
+        int firstVisiblePosition = parent.getFirstVisiblePosition();
+        return parent.getChildAt(position - firstVisiblePosition).findViewById(imageViewId);
+    }
 }

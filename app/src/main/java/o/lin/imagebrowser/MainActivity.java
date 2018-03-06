@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                         .urls(baseAdapter.getImageUrls())
                         .targetParent(parent)
                         .imageViewId(R.id.ivImage2)
+                        .target(view)
                         .linkage(true)
                         .originIsCenterCrop(true)
                         .position(position)
@@ -172,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                             .targetParent(recyclerView)
                             .imageViewId(R.id.ivImage)
                             .originIsCenterCrop(true)
+                            .target(holder.ivImage)
                             .linkage(true)
                             .position(holder.getLayoutPosition())
                             .show();

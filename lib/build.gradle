@@ -34,7 +34,7 @@ publish {
     userOrg = 'linwg1988'
     groupId = 'org.linwg1988'
     artifactId = 'imagebrowser'
-    publishVersion = '1.1.0'
+    publishVersion = '1.1.1'
     desc = 'A libary uses for browsing image detail.'
     website = 'https://github.com/linwg1988/imagebrowser'
 }

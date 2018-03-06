@@ -153,6 +153,7 @@ public class ImageBrowser extends Fragment {
     private TextView tvTitle;
     private TextView tvDescriptions;
     private Builder builder;
+    private OnShowingClickListener mOnShowingClickListener;
 
 
     @Nullable
@@ -241,7 +242,6 @@ public class ImageBrowser extends Fragment {
         ivCustom = (ImageView) view.findViewById(R.id.ivCustom);
         tvCustom = (TextView) view.findViewById(R.id.tvCustom);
         ObjectAnimator.ofFloat(shadowView, "alpha", 1f).setDuration(ANIMATION_DURATION).start();
-
         viewList.clear();
         for (int i = 0; i < imageUrls.size(); i++) {
             View imageLayout = getActivity().getLayoutInflater().inflate(R.layout.item_image_browser, null);
@@ -386,7 +386,7 @@ public class ImageBrowser extends Fragment {
         circlePageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             @Override
-            public void onPageSelected(int position) {
+            public void onPageSelected(final int position) {
                 tvTitle.setText(getDes(position));
                 String c = String.valueOf(position + 1);
                 String all = c + "/" + String.valueOf(imageUrls.size());
@@ -418,6 +418,14 @@ public class ImageBrowser extends Fragment {
                         }
                         performScrollToTop(builder.parent, offset, position);
                     }
+                }
+                if(builder != null&& builder.child != null && builder.parent != null){
+                    builder.parent.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            builder.changeChild(position);
+                        }
+                    });
                 }
             }
 
@@ -506,8 +514,18 @@ public class ImageBrowser extends Fragment {
         this.builder = builder;
     }
 
+    public void onResourceReady() {
+        if(mOnShowingClickListener != null){
+            mOnShowingClickListener.onShowing();
+        }
+    }
+
     public interface OnPhotoLongClickListener {
         void handlerLongClick(ImageBrowser browser, int position);
+    }
+
+    public interface OnShowingClickListener {
+        void onShowing();
     }
 
     public static class Mode {
@@ -623,11 +641,13 @@ public class ImageBrowser extends Fragment {
         }
 
         /**
-         * Once I call this is want to set the origin view's alpha so the animation will be playing like the origin view is
+         * Write by the past date:Once I call this is want to set the origin view's alpha so the animation will be playing like the origin view is
          * really moving.But it works bad,so just ignore this method. (ps:HaHa...I just suppose one day I'll make it work,so I didn't delete it.)
+         *
+         * Note :I hide the target image view when the photo view on animation start by set it's alpha to 0. And change the child's reference
+         * after the viewpager on selected.OK! Now it works.
          */
-        @Deprecated
-        private Builder target(View child) {
+        public Builder target(View child) {
             this.child = child;
             return this;
         }
@@ -667,6 +687,7 @@ public class ImageBrowser extends Fragment {
 
         /**
          * @param isCenterCrop If the origin imageView's ScaleType is CENTER_CROP, set this true;
+         *                     (Now I wonder whether I can create transform animation from all the origin scaleType without this setting?)
          * @return self
          */
         public Builder originIsCenterCrop(boolean isCenterCrop) {
@@ -702,7 +723,7 @@ public class ImageBrowser extends Fragment {
             bundle.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
             bundle.putBoolean(IB_SHOW_TITLE, showTitle);
             bundle.putCharSequence(IB_CUSTOM_TEXT, customChar);
-            bundle.putParcelableArray(IB_LOCATIONS, viewRectFInfo.imgLocations);
+            bundle.putParcelableArray(IB_LOCATIONS, viewRectFInfo == null ? null:viewRectFInfo.imgLocations);
             imageBrowser.setArguments(bundle);
             imageBrowser.setBuilder(this);
             imageBrowser.setOnDownloadClickListener(this.downloadListener);
@@ -711,11 +732,16 @@ public class ImageBrowser extends Fragment {
             imageBrowser.setOnCustomTxtClickListener(this.customTxtListener);
             imageBrowser.setOnLongClickListener(l);
             if (child != null) {
-                child.setAlpha(0.2f);
                 imageBrowser.setOnDismissListener(new OnDismissListener() {
                     @Override
                     public void onDismiss() {
                         child.setAlpha(1);
+                    }
+                });
+                imageBrowser.setOnShowingListener(new OnShowingClickListener() {
+                    @Override
+                    public void onShowing() {
+                        child.setAlpha(0.0f);
                     }
                 });
             }
@@ -726,6 +752,24 @@ public class ImageBrowser extends Fragment {
             ImageBrowser imageBrowser = build();
             imageBrowser.show(((FragmentActivity) context).getSupportFragmentManager(), "ImageBrowserTag");
         }
+
+        void changeChild(int position) {
+            child.setAlpha(1);
+            if (parent instanceof AbsListView) {
+                child = AbsListViewHelper.findChildByPosition((AbsListView) parent,imageViewId,position);
+            } else if (parent instanceof RecyclerView) {
+                child =RecyclerViewHelper.findChildByPosition((RecyclerView) parent,imageViewId,position);
+            }else{
+                child = ViewGroupHelper.findChildByPosition(parent,imageViewId,position);
+            }
+            if(child != null){
+                child.setAlpha(0);
+            }
+        }
+    }
+
+    private void setOnShowingListener(OnShowingClickListener l) {
+        this.mOnShowingClickListener = l;
     }
 
     private void setOnLongClickListener(OnPhotoLongClickListener l) {
