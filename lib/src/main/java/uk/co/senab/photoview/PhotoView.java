@@ -22,6 +22,7 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -30,7 +31,7 @@ import uk.co.senab.photoview.PhotoViewAttacher.OnMatrixChangedListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnViewTapListener;
 
-public class PhotoView extends ImageView implements IPhotoView {
+public class PhotoView extends AppCompatImageView implements IPhotoView {
 
     private final PhotoViewAttacherCompat mAttacher;
 
@@ -185,8 +186,24 @@ public class PhotoView extends ImageView implements IPhotoView {
         mAttacher.toRectF(rectF);
     }
 
+    public void toFitXYRectF(RectF rectF) {
+        mAttacher.toFitXYRectF(rectF);
+    }
+
+    public void toFitCenterRectF(RectF rectF) {
+        mAttacher.toFitCenterRectF(rectF);
+    }
+
     public void fromRectF(RectF rectF) {
         mAttacher.fromRectF(rectF);
+    }
+
+    public void fromFitXYRectF(RectF rectF) {
+        mAttacher.fromFitXYRectF(rectF);
+    }
+
+    public void fromFitCenterRectF(RectF rectF) {
+        mAttacher.fromFitCenterRectF(rectF);
     }
 
     @Override

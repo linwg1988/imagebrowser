@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ import linwg.strategy.ImageLoaderFactory;
 public class MainActivity extends AppCompatActivity implements ImagePicker.OnImagePickerListener {
     ArrayList<String> imageUrls = new ArrayList<>();
     private ImageAdapter baseAdapter;
+    String imgUrl0 = "http://img4.imgtn.bdimg.com/it/u=108703274,3260405534&fm=214&gp=0.jpg";
     String imgUrl1 = "http://imgsrc.baidu.com/baike/pic/item/a8014c086e061d95b8e66cc57bf40ad163d9caaf.jpg";
     String imgUrl2 = "http://img3.duitang.com/uploads/item/201412/30/20141230214525_AGRCa.thumb.700_0.jpeg";
     String imgUrl3 = "http://img4q.duitang.com/uploads/item/201502/24/20150224110429_cGxLw.thumb.700_0.jpeg";
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     RecyclerView recyclerView;
     ArrayList<String> urls = new ArrayList<>();
     private MAdapter mAdapter;
+    ImageView.ScaleType scaleType = ImageView.ScaleType.CENTER_CROP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +81,8 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         final GridView grid = (GridView) findViewById(R.id.grid);
         recyclerView = findViewById(R.id.recyclerView);
 
-        baseAdapter = new ImageAdapter(imageUrls,this);
+        baseAdapter = new ImageAdapter(imageUrls, this);
+        baseAdapter.setScaleType(scaleType);
         grid.setAdapter(baseAdapter);
         grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -88,21 +92,35 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                         .targetParent(parent)
                         .imageViewId(R.id.ivImage2)
                         .target(view)
+                        .scaleType(((ImageView) view).getScaleType())
                         .linkage(true)
-                        .originIsCenterCrop(true)
                         .position(position)
                         .show();
             }
         });
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(gridLayoutManager);
-        mAdapter = new MAdapter();
+        mAdapter = new MAdapter(this, recyclerView);
         recyclerView.setAdapter(mAdapter);
+        RadioGroup rgType = findViewById(R.id.rgType);
+        rgType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                scaleType = checkedId == R.id.rbCenterCrop ? ImageView.ScaleType.CENTER_CROP : checkedId == R.id.rbFitXY ? ImageView.ScaleType.FIT_XY : checkedId == R.id.rbFitCenter ?ImageView.ScaleType.FIT_CENTER: ImageView.ScaleType.CENTER_INSIDE;
+                imageUrls.add(imgUrl1);
+                baseAdapter.setScaleType(scaleType);
+                mAdapter = new MAdapter(MainActivity.this, recyclerView);
+                mAdapter.setScaleType(scaleType);
+                mAdapter.setData(imageUrls);
+                recyclerView.setAdapter(mAdapter);
+            }
+        });
 
         findViewById(R.id.label).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 urls.clear();
+                urls.add(imgUrl0);
                 urls.add(imgUrl1);
                 urls.add(imgUrl2);
                 urls.add(imgUrl3);
@@ -124,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                 imageUrls.clear();
                 imageUrls.addAll(urls);
                 baseAdapter.setImageUrls(urls);
+                mAdapter.setData(imageUrls);
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -147,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                 new AlertDialog.Builder(MainActivity.this).setItems(new String[]{"1", "2", "3"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((TextView)findViewById(R.id.tvColumnCount)).setText(which+1+"");
-                        grid.setNumColumns(which+1);
-                        gridLayoutManager.setSpanCount(which+1);
+                        ((TextView) findViewById(R.id.tvColumnCount)).setText("列数：" + (which + 1));
+                        grid.setNumColumns(which + 1);
+                        gridLayoutManager.setSpanCount(which + 1);
                         baseAdapter.notifyDataSetChanged();
                         mAdapter.notifyDataSetChanged();
                     }
@@ -158,25 +177,40 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         });
     }
 
-    class MAdapter extends RecyclerView.Adapter<VH> {
+    static class MAdapter extends RecyclerView.Adapter<VH> {
+        Context context;
+        ArrayList<String> imageUrls = new ArrayList();
+
+        public void setScaleType(ImageView.ScaleType scaleType) {
+            this.scaleType = scaleType;
+        }
+
+        private ImageView.ScaleType scaleType = ImageView.ScaleType.MATRIX;
+        private RecyclerView recyclerView;
+
+        public MAdapter(Context context, RecyclerView recyclerView) {
+            this.context = context;
+            this.recyclerView = recyclerView;
+        }
 
         @Override
         public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.item_image, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.item_image, parent, false);
             return new VH(view);
         }
 
         @Override
         public void onBindViewHolder(final VH holder, int position) {
-            Glide.with(MainActivity.this).load(imageUrls.get(holder.getLayoutPosition())).into(holder.ivImage);
+            holder.ivImage.setScaleType(scaleType);
+            Glide.with(context).load(imageUrls.get(holder.getLayoutPosition())).into(holder.ivImage);
             holder.ivImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new ImageBrowser.Builder(MainActivity.this)
+                    new ImageBrowser.Builder(context)
                             .urls(imageUrls)
                             .targetParent(recyclerView)
                             .imageViewId(R.id.ivImage)
-                            .originIsCenterCrop(true)
+                            .scaleType(holder.ivImage.getScaleType())
                             .target(holder.ivImage)
                             .linkage(true)
                             .position(holder.getLayoutPosition())
@@ -185,13 +219,19 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             });
         }
 
+        public void setData(ArrayList<String> urls) {
+            imageUrls.clear();
+            imageUrls.addAll(urls);
+            notifyDataSetChanged();
+        }
+
         @Override
         public int getItemCount() {
             return imageUrls.size();
         }
     }
 
-    class VH extends RecyclerView.ViewHolder {
+    static class VH extends RecyclerView.ViewHolder {
         ImageView ivImage;
 
         public VH(View itemView) {
@@ -201,9 +241,9 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     }
 
     public void pickImage(View view) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},123);
-        }else{
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123);
+        } else {
             new ImagePicker.Builder().maxPictureNumber(99).build().show(getSupportFragmentManager(), "imagePicker");
         }
     }
@@ -211,20 +251,16 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 123){
+        if (requestCode == 123) {
             List<String> deniedPermissions = new ArrayList<>();
-            for (int i = 0; i < grantResults.length; i++)
-            {
-                if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
-                {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     deniedPermissions.add(permissions[i]);
                 }
             }
-            if (deniedPermissions.size() > 0)
-            {
-                Toast.makeText(this,"获取权限失败",Toast.LENGTH_SHORT).show();
-            } else
-            {
+            if (deniedPermissions.size() > 0) {
+                Toast.makeText(this, "获取权限失败", Toast.LENGTH_SHORT).show();
+            } else {
                 new ImagePicker.Builder().maxPictureNumber(99).build().show(getSupportFragmentManager(), "imagePicker");
             }
         }
@@ -234,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     public void onImagesPicked(List<String> imgPaths, String selectedDir) {
         imageUrls.clear();
         imageUrls.addAll(imgPaths);
+        mAdapter.setData(imageUrls);
         mAdapter.notifyDataSetChanged();
         baseAdapter.setImageUrls(imageUrls);
     }
@@ -248,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
 
         private ArrayList<String> imageUrls;
         private Context context;
+        private ImageView.ScaleType scaleType;
 
         public void setImageUrls(ArrayList<String> imageUrls) {
             this.imageUrls = imageUrls;
@@ -287,9 +325,14 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                 convertView.setLayoutParams(new AbsListView.LayoutParams(width, width));
             }
             ImageView img = (ImageView) convertView;
-            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            img.setScaleType(scaleType);
             Glide.with(context).load(imageUrls.get(position)).into(img);
             return convertView;
+        }
+
+        public void setScaleType(ImageView.ScaleType scaleType) {
+            this.scaleType = scaleType;
+            notifyDataSetChanged();
         }
     }
 

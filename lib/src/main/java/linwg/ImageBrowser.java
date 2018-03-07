@@ -47,7 +47,7 @@ import uk.co.senab.photoview.PhotoView;
  * ImageBrowser Created by wengui on 2016/3/9.
  */
 public class ImageBrowser extends Fragment {
-    public static int ANIMATION_DURATION = 550;
+    public static int ANIMATION_DURATION = 400;
     /**
      * The key of the {@link #mode}
      */
@@ -89,9 +89,9 @@ public class ImageBrowser extends Fragment {
      */
     private static final String IB_CUSTOM_TEXT = "ib_custom_text";
     /**
-     * The key of the {@link #isCenterCrop}
+     * The key of the {@link #scaleTypeName}
      */
-    private static final String IB_IS_ORIGIN_CENTER_CROP = "ib_is_origin_center_crop";
+    private static final String IMG_SCALE_TYPE = "img_scale_type";
     /**
      * The key of the {@link #showTitle}
      */
@@ -124,10 +124,7 @@ public class ImageBrowser extends Fragment {
      * This is always setting by the origin view's size.The default size is 100dp{@link #DEFAULT_THUMB_SIZE}.
      */
     private int thumbSize;
-    /**
-     * If true,the {@link WrapImageView} will run matrix animation,otherwise scale the photoView.
-     */
-    boolean isCenterCrop;
+    String scaleTypeName = ImageView.ScaleType.MATRIX.name();
     private CharSequence customChar;
     /**
      * There are four {@link Mode} use for this param,use {@link Mode#DOWNLOAD} or{@link Mode#DELETE}
@@ -138,7 +135,7 @@ public class ImageBrowser extends Fragment {
      */
     private int mode = Mode.NONE;
 
-    private ArrayList<WrapImageView> viewList = new ArrayList<WrapImageView>();
+    private ArrayList<WrapImageView> viewList = new ArrayList<>();
 
     private ImageView ivDownLoad;
     private ImagePagerAdapter imagePagerAdapter;
@@ -171,7 +168,7 @@ public class ImageBrowser extends Fragment {
             customImgRes = savedInstanceState.getInt(IB_CUSTOM_IMG_RES);
             customTextRes = savedInstanceState.getInt(IB_CUSTOM_TEXT_RES);
             customChar = savedInstanceState.getCharSequence(IB_CUSTOM_TEXT);
-            isCenterCrop = savedInstanceState.getBoolean(IB_IS_ORIGIN_CENTER_CROP);
+            scaleTypeName = savedInstanceState.getString(IMG_SCALE_TYPE);
             showTitle = savedInstanceState.getBoolean(IB_SHOW_TITLE);
         } else {
             final Bundle arguments = getArguments();
@@ -185,7 +182,7 @@ public class ImageBrowser extends Fragment {
             customImgRes = arguments.getInt(IB_CUSTOM_IMG_RES);
             customTextRes = arguments.getInt(IB_CUSTOM_TEXT_RES);
             customChar = arguments.getCharSequence(IB_CUSTOM_TEXT);
-            isCenterCrop = arguments.getBoolean(IB_IS_ORIGIN_CENTER_CROP);
+            scaleTypeName = arguments.getString(IMG_SCALE_TYPE);
             showTitle = arguments.getBoolean(IB_SHOW_TITLE);
         }
         if (thumbSize == 0) {
@@ -228,8 +225,8 @@ public class ImageBrowser extends Fragment {
         outState.putInt(IB_CUSTOM_TEXT_RES, customTextRes);
         outState.putCharSequence(IB_CUSTOM_TEXT, customChar);
         outState.putParcelableArray(IB_LOCATIONS, rectFs);
-        outState.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
-        outState.putBoolean(IB_IS_ORIGIN_CENTER_CROP, showTitle);
+        outState.putString(IMG_SCALE_TYPE, scaleTypeName);
+        outState.putBoolean(IB_SHOW_TITLE, showTitle);
     }
 
     /**
@@ -266,7 +263,7 @@ public class ImageBrowser extends Fragment {
 
             iv_thumbnail.setLayoutParams(params);
             WrapImageView wrapImageView = new WrapImageView(this, imageLayout, imageUrls.get(i), thumbUrls == null ? null : thumbUrls.get(i),
-                    rectFs == null ? null : rectFs[i], i == position, screenWidth, screenHeight, isCenterCrop);
+                    rectFs == null ? null : rectFs[i], i == position, screenWidth, screenHeight, ImageView.ScaleType.valueOf(scaleTypeName));
             viewList.add(wrapImageView);
         }
 
@@ -546,14 +543,9 @@ public class ImageBrowser extends Fragment {
         private int position;
         private ArrayList<String> thumbUrls;
         private int thumbSize;
-        //        RectF[] imgLocations;
         ViewGroup parent;
         ViewRectFInfo viewRectFInfo;
         int imageViewId;
-        //        float leftOffset;
-//        float topOffset;
-//        float bottomOffset;
-//        float rightOffset;
         private OnDownloadClickListener downloadListener;
         private OnDeleteClickListener deleteListener;
         private View.OnClickListener customImgListener;
@@ -561,10 +553,10 @@ public class ImageBrowser extends Fragment {
         private int customImgRes;
         private int customTextRes;
         private CharSequence customChar;
-        private boolean isCenterCrop;
         private View child;
         private boolean showTitle;
         boolean linkage;
+        private ImageView.ScaleType scaleType;
 
         public Builder(Context context) {
             this.context = context;
@@ -654,6 +646,11 @@ public class ImageBrowser extends Fragment {
             return this;
         }
 
+        public Builder scaleType(ImageView.ScaleType scaleType) {
+            this.scaleType = scaleType;
+            return this;
+        }
+
         public Builder setDownloadListener(OnDownloadClickListener listener) {
             mode = Mode.DOWNLOAD;
             this.downloadListener = listener;
@@ -687,16 +684,6 @@ public class ImageBrowser extends Fragment {
             return this;
         }
 
-        /**
-         * @param isCenterCrop If the origin imageView's ScaleType is CENTER_CROP, set this true;
-         *                     (Now I wonder whether I can create transform animation from all the origin scaleType without this setting?)
-         * @return self
-         */
-        public Builder originIsCenterCrop(boolean isCenterCrop) {
-            this.isCenterCrop = isCenterCrop;
-            return this;
-        }
-
         public ImageBrowser build() {
             if (parent != null) {
                 if (parent instanceof RecyclerView) {
@@ -722,7 +709,7 @@ public class ImageBrowser extends Fragment {
             bundle.putInt(IB_THUMB_SIZE, thumbSize);
             bundle.putInt(IB_CUSTOM_IMG_RES, customImgRes);
             bundle.putInt(IB_CUSTOM_TEXT_RES, customTextRes);
-            bundle.putBoolean(IB_IS_ORIGIN_CENTER_CROP, isCenterCrop);
+            bundle.putString(IMG_SCALE_TYPE, scaleType == null ? ImageView.ScaleType.MATRIX.name() : scaleType.name());
             bundle.putBoolean(IB_SHOW_TITLE, showTitle);
             bundle.putCharSequence(IB_CUSTOM_TEXT, customChar);
             bundle.putParcelableArray(IB_LOCATIONS, viewRectFInfo == null ? null:viewRectFInfo.imgLocations);
@@ -807,7 +794,7 @@ public class ImageBrowser extends Fragment {
         if(mOnShowingClickListener != null){
             mOnShowingClickListener.onChildChange(position);
         }
-        viewList.get(position).endAnimation(ImageBrowser.this);
+        viewList.get(position).endAnimation();
     }
 
     protected void onDismiss() {

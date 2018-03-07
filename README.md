@@ -7,12 +7,14 @@
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.1.0'
+    compile 'org.linwg1988:imagebrowser:1.1.3'
 }
 ~~~
-已经更新到了1.1.0版本，这个版本相对以前来说支持了RecyclerView的列表，并且在相对复杂的列表子项中提供<br>
-ImageView的id配置，使图片的初始位置更加精确，过渡动画更加友好。由于需要响应back事件，<br>
-我们需要在基类Activity中增加判断，代码如下：
+支持图片列表类型为RecyclerView，ListView和GridView。在相对复杂的列表子项中提供ImageView的id配置，<br>
+便于精确获取图片的初始位置，使过渡动画正确完成。此外移除了1.1.2版本以前的isCenterCrop参数设定，改<br>
+为提供原始ImageView的ScaleType的方法，暂时只支持CENTER_CROP,FIT_CENTER,FIT_XY,CENTER_INSIDE这4个类<br>
+型，其中CENTER_INSIDE在遇到图片比控件小的时候依然存在问题，建议暂不使用，前三个ScaleType相信已经够用了。<br>
+由于需要响应back事件，我们需要在基类Activity中增加判断，代码如下：<br>
 ~~~Java
 @Override
 public void onBackPressed() {
@@ -59,8 +61,8 @@ public class GlideLoaderStrategy implements IImageLoader{
     }
 }
 ~~~
-前戏已近搞定，是不是感觉有点麻烦，哈哈，想高潮前戏还是很重要的嘛~~（老司机开车，新手请跳过），万一你也用Glide，那就可以忽略了嘛。<br>
-接下来是使用图片浏览器了，很简单，一句话搞定：
+如果你也用Glide，那就可以直接使用库中自带的这个类。<br>
+接下来是使用图片浏览器了，比较简单：
 ~~~Java
 new ImageBrowser.Builder(MainActivity.this)
         .urls(imageUrls)
@@ -74,12 +76,14 @@ new ImageBrowser.Builder(MainActivity.this)
             })
         .targetParent(parent)//想要支持动画的话，这个很重要
         .thumbSize(120)//缩略图的尺寸，不设值的话会自动检测原始图的大小，如果没有设置targetParent的话则默认100dp
-        .originIsCenterCrop(true)//重要
+        .target(view)//实际点击的View，通常为被点击的ImageView
+        .scaleType(((ImageView) view).getScaleType())//原始图片的缩放模式
+        .linkage(true)//设置联动，外层列表将跟随内部ViewPager的滑动进行更新滚动位置
         .position(position)//起始索引，默认是第一张的话就没必要设置了
         .show();
 ~~~
 
-一些参数明眼上看过去就明白的我就不再解释了，这里主要说一说重要的几个参数
+主要说一说重要的几个参数
 
 ###a)`mode` <br>
 ####提供了4个模式,<br>
@@ -93,11 +97,12 @@ new ImageBrowser.Builder(MainActivity.this)
 的url数目一致（AdapterView的话适配器中的getCount()返回值必须和url的数目一致），否则动画效果难以保证；<br>
 ###c)`imageViewId` <br>
 新增！这个参数是实际列表控件中ImageView控件的id，有时候列表项有间隙或其它子项的时候，设置这个id将使图片的原始位置更加精确；<br>
-###d)`originIsCenterCrop` <br>
-通常在排列我们原始图片的时候我们为了整齐会将ImageView的ScaleType设置为CENTER_CROP，<br>
-那么这里就必须将originIsCenterCrop设置为true了，以保证最后结束动画的效果，当然如果你使用其他的ScaleType，就请忽略掉这个设置吧；<br>
-###e)`linkage` <br>
+###d)`linkage` <br>
 新增！此参数设置为true时，图片浏览器与外层的列表控件将形成联动，需要注意的是targetParent和imageViewId必须同时设置才能起到作用；<br>
+###e)`scaleType` <br>
+此参数为被点击图片的缩放模式，不同的缩放模式对过度动画有不同的影响。<br>
+###f)`target` <br>
+此参数为被点击的图片实际控件，被设置后，浏览器在启动时将隐藏该图片，浏览器关闭时恢复相应位置的控件可见。<br>
 
 好了，用法和注意点就是这样了，本库中浏览大图使用的控件是开源控件[PhotoView](https://github.com/chrisbanes/PhotoView)，我个人对<br>
 里面的源码做了一定的修改，实现的方式也是效仿PhotoView中对图片的处理。也欢迎大家使，，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...<br>

@@ -289,6 +289,10 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 		return getValue(mSuppMatrix, Matrix.MSCALE_X);
 	}
 
+	public final float getScaleY() {
+		return getValue(mSuppMatrix, Matrix.MSCALE_Y);
+	}
+
 	@Override
 	public final ScaleType getScaleType() {
 		return mScaleType;
