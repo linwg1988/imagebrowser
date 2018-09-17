@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,8 +16,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -29,11 +26,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import linwg.org.lib.R;
@@ -194,11 +190,11 @@ public class ImageBrowser extends Fragment {
         contentView = inflater.inflate(R.layout.fragment_iamge_browser, null);
         initView(contentView);
         decorView = (ViewGroup) getActivity().getWindow().getDecorView();
-        if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.M){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int systemWindowInsetBottom = decorView.getRootWindowInsets().getSystemWindowInsetBottom();
-            if(systemWindowInsetBottom != 0 && rectFs != null){
-                for(int i=0;i<rectFs.length;i++){
-                    rectFs[i].offset(0,-systemWindowInsetBottom/2);
+            if (systemWindowInsetBottom != 0 && rectFs != null) {
+                for (int i = 0; i < rectFs.length; i++) {
+                    rectFs[i].offset(0, -systemWindowInsetBottom / 2);
                 }
             }
         }
@@ -438,21 +434,35 @@ public class ImageBrowser extends Fragment {
         });
     }
 
+    public void setIndicatorPaddingBottom(final int paddingBottom) {
+        circlePageIndicator.post(new Runnable() {
+            @Override
+            public void run() {
+                int dp6 = (int) Util.dp2px(getActivity(), 6);
+                int dp12 = dp6 * 2;
+                circlePageIndicator.setPadding(0, 0, 0, paddingBottom);
+                tvDescriptions.setPadding(0, 0, 0, paddingBottom);
+                tvDescriptions.setPadding(dp12, dp12, dp12, dp12 + paddingBottom);
+                tvIndicator.setPadding(dp6, dp6, dp6, dp6 + paddingBottom);
+            }
+        });
+    }
+
     private void performScrollToBottom(ViewGroup parent, float offset, int position) {
         if (parent instanceof AbsListView) {
-            AbsListViewHelper.performScrollToBottom((AbsListView) parent,offset,position);
+            AbsListViewHelper.performScrollToBottom((AbsListView) parent, offset, position);
         } else if (parent instanceof RecyclerView) {
-            RecyclerViewHelper.performScrollToBottom((RecyclerView) parent,offset,position);
-        }else{
+            RecyclerViewHelper.performScrollToBottom((RecyclerView) parent, offset, position);
+        } else {
 
         }
     }
 
     private void performScrollToTop(ViewGroup parent, float offset, int position) {
         if (parent instanceof AbsListView) {
-            AbsListViewHelper.performScrollToTop((AbsListView) parent,offset,position);
+            AbsListViewHelper.performScrollToTop((AbsListView) parent, offset, position);
         } else if (parent instanceof RecyclerView) {
-            RecyclerViewHelper.performScrollToTop((RecyclerView) parent,offset,position);
+            RecyclerViewHelper.performScrollToTop((RecyclerView) parent, offset, position);
         }
     }
 
@@ -512,7 +522,7 @@ public class ImageBrowser extends Fragment {
     }
 
     public void onResourceReady() {
-        if(mOnShowingClickListener != null){
+        if (mOnShowingClickListener != null) {
             mOnShowingClickListener.onShowing();
         }
     }
@@ -637,7 +647,7 @@ public class ImageBrowser extends Fragment {
         /**
          * Write by the past date:Once I call this is want to set the origin view's alpha so the animation will be playing like the origin view is
          * really moving.But it works bad,so just ignore this method. (ps:HaHa...I just suppose one day I'll make it work,so I didn't delete it.)
-         *
+         * <p>
          * Note :I hide the target image view when the photo view on animation start by set it's alpha to 0. And change the child's reference
          * after the viewpager on selected.OK! Now it works.
          */
@@ -712,7 +722,7 @@ public class ImageBrowser extends Fragment {
             bundle.putString(IMG_SCALE_TYPE, scaleType == null ? ImageView.ScaleType.MATRIX.name() : scaleType.name());
             bundle.putBoolean(IB_SHOW_TITLE, showTitle);
             bundle.putCharSequence(IB_CUSTOM_TEXT, customChar);
-            bundle.putParcelableArray(IB_LOCATIONS, viewRectFInfo == null ? null:viewRectFInfo.imgLocations);
+            bundle.putParcelableArray(IB_LOCATIONS, viewRectFInfo == null ? null : viewRectFInfo.imgLocations);
             imageBrowser.setArguments(bundle);
             imageBrowser.setBuilder(this);
             imageBrowser.setOnDownloadClickListener(this.downloadListener);
@@ -750,13 +760,13 @@ public class ImageBrowser extends Fragment {
         void changeChild(int position) {
             child.setAlpha(1);
             if (parent instanceof AbsListView) {
-                child = AbsListViewHelper.findChildByPosition((AbsListView) parent,imageViewId,position);
+                child = AbsListViewHelper.findChildByPosition((AbsListView) parent, imageViewId, position);
             } else if (parent instanceof RecyclerView) {
-                child =RecyclerViewHelper.findChildByPosition((RecyclerView) parent,imageViewId,position);
-            }else{
-                child = ViewGroupHelper.findChildByPosition(parent,imageViewId,position);
+                child = RecyclerViewHelper.findChildByPosition((RecyclerView) parent, imageViewId, position);
+            } else {
+                child = ViewGroupHelper.findChildByPosition(parent, imageViewId, position);
             }
-            if(child != null){
+            if (child != null) {
                 child.setAlpha(0);
             }
         }
@@ -791,7 +801,7 @@ public class ImageBrowser extends Fragment {
         tvTitle.animate().translationY(-tvTitle.getHeight()).setDuration(250).start();
         circlePageIndicator.animate().translationY(circlePageIndicator.getHeight()).setDuration(250).start();
         tvDescriptions.animate().alpha(0).setDuration(250).start();
-        if(mOnShowingClickListener != null){
+        if (mOnShowingClickListener != null) {
             mOnShowingClickListener.onChildChange(position);
         }
         viewList.get(position).endAnimation();

@@ -7,7 +7,7 @@
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.1.3'
+    compile 'org.linwg1988:imagebrowser:1.1.4'
 }
 ~~~
 支持图片列表类型为RecyclerView，ListView和GridView。在相对复杂的列表子项中提供ImageView的id配置，<br>
@@ -105,8 +105,10 @@ new ImageBrowser.Builder(MainActivity.this)
 此参数为被点击的图片实际控件，被设置后，浏览器在启动时将隐藏该图片，浏览器关闭时恢复相应位置的控件可见。<br>
 
 好了，用法和注意点就是这样了，本库中浏览大图使用的控件是开源控件[PhotoView](https://github.com/chrisbanes/PhotoView)，我个人对<br>
-里面的源码做了一定的修改，实现的方式也是效仿PhotoView中对图片的处理。也欢迎大家使，，有什么问题的话，也请提出，时时刻刻欢迎打脸啊...<br>
-受虐倾向不要太明显...<br>
+里面的源码做了一定的修改，实现的方式也是效仿PhotoView中对图片的处理。欢迎大家使用，有什么问题的话，也请提出。<br>
+
+#1.1.4
+对于手机底部导航栏影响指示器的显示提供了设置底部指示器内间距的方法使用setIndicatorPaddingBottom(int paddingBottom)<br>
 
 最后上一下效果图：<br>
 ![](http://ofj4ai6ke.bkt.clouddn.com/local.gif)<br>
