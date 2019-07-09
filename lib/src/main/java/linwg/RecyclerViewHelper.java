@@ -5,7 +5,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AbsListView;
+import android.widget.ImageView;
 
 /**
  * Created by linwg on 2018/3/3.
@@ -26,7 +26,7 @@ class RecyclerViewHelper {
         }
         int firstVisiblePosition;
         int lastVisiblePosition;
-
+        String scaleType = ImageView.ScaleType.MATRIX.name();
         if (imageViewId != 0) {
             //Maybe the imageView is contains by the itemView of ViewGroup ,we need measure offset.
             int[] imgLocate = new int[2];
@@ -36,6 +36,7 @@ class RecyclerViewHelper {
             if (imageView == null) {
                 throw new IllegalStateException("The item of RecyclerView#" + recyclerView.getId() + " does not contains Id #" + imageViewId + ".");
             }
+            scaleType = ((ImageView) imageView).getScaleType().name();
             imageView.getLocationOnScreen(imgLocate);
             itemView.getLocationOnScreen(itemLocate);
 
@@ -49,7 +50,7 @@ class RecyclerViewHelper {
 
 
         if (dataCount > viewCount) {
-            viewRectFInfo.imgLocations = new RectF[dataCount];
+            viewRectFInfo.imgLocations = new ImageRectFInfo[dataCount];
             //The calculate result of these two method may be not equals viewCount,so wo just user the attached view's index replace visible position.
 //            firstVisiblePosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
 //            lastVisiblePosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
@@ -75,7 +76,9 @@ class RecyclerViewHelper {
                 if ((numColumns > 1 && (i != 0 && columnIndex == 0)) || (numColumns == 1)) {
                     overLineCount--;
                 }
-                viewRectFInfo.imgLocations[i] = rectF;
+                viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
+                viewRectFInfo.imgLocations[i].rectF = rectF;
+                viewRectFInfo.imgLocations[i].scaleType = scaleType;
             }
             for (int i = firstVisiblePosition; i < lastVisiblePosition + 1; i++) {
                 int[] locate = new int[2];
@@ -87,7 +90,9 @@ class RecyclerViewHelper {
                 }
                 child.getLocationOnScreen(locate);
                 RectF rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
-                viewRectFInfo.imgLocations[i] = rectF;
+                viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
+                viewRectFInfo.imgLocations[i].rectF = rectF;
+                viewRectFInfo.imgLocations[i].scaleType = scaleType;
             }
 
             int futureLineCount = 0;
@@ -101,20 +106,26 @@ class RecyclerViewHelper {
                 rectF.right = lastChildRectF.right - (numColumns - columnIndex - 1) * itemWidth;
                 rectF.top = lastChildRectF.top + itemHeight * futureLineCount;
                 rectF.bottom = lastChildRectF.bottom + itemHeight * futureLineCount;
-                viewRectFInfo.imgLocations[i] = rectF;
+                viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
+                viewRectFInfo.imgLocations[i].rectF = rectF;
+                viewRectFInfo.imgLocations[i].scaleType = scaleType;
             }
         } else {
-            viewRectFInfo.imgLocations = new RectF[viewCount];
+            viewRectFInfo.imgLocations = new ImageRectFInfo[viewCount];
             for (int i = 0; i < viewCount; i++) {
                 int[] locate = new int[2];
                 if (imageViewId != 0) {
                     final View child = layoutManager.getChildAt(i).findViewById(imageViewId);
                     child.getLocationOnScreen(locate);
-                    viewRectFInfo.imgLocations[i] = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
+                    viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
+                    viewRectFInfo.imgLocations[i].rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
+                    viewRectFInfo.imgLocations[i].scaleType = scaleType;
                 } else {
                     final View child = layoutManager.getChildAt(i);
                     child.getLocationOnScreen(locate);
-                    viewRectFInfo.imgLocations[i] = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
+                    viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
+                    viewRectFInfo.imgLocations[i].rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
+                    viewRectFInfo.imgLocations[i].scaleType = scaleType;
                 }
             }
         }

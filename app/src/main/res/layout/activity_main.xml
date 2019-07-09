@@ -21,15 +21,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
 
-                android:layout_below="@+id/scrollView"
                 android:numColumns="1"></GridView>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/scrollView"
                 android:visibility="gone"></android.support.v7.widget.RecyclerView>
+
+            <RelativeLayout
+                android:id="@+id/rlImages"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/ivImageA"
+                    android:layout_width="100dp"
+                    android:scaleType="centerCrop"
+                    android:layout_height="100dp" />
+                <ImageView
+                    android:id="@+id/ivImageB"
+                    android:layout_width="200dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginLeft="100dp"
+                    android:layout_height="200dp" />
+                <ImageView
+                    android:id="@+id/ivImageD"
+                    android:layout_width="100dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginTop="100dp"
+                    android:layout_height="100dp" />
+                <ImageView
+                    android:id="@+id/ivImageC"
+                    android:layout_width="300dp"
+                    android:scaleType="fitXY"
+                    android:layout_marginTop="200dp"
+                    android:layout_height="100dp" />
+            </RelativeLayout>
         </FrameLayout>
 
         <LinearLayout
@@ -92,6 +120,19 @@
                         android:text="RecyclerView"
                         android:textColor="#333"
                         android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/parentViewBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_toRightOf="@+id/gridViewBtn"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:text="ViewGroup"
+                        android:textColor="#333"
+                        android:textSize="12sp" />
+
                 </LinearLayout>
 
             </HorizontalScrollView>
@@ -116,6 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="CENTER_CROP"
+                    android:checked="true"
                     android:textSize="10sp" />
 
                 <RadioButton

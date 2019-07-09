@@ -22,6 +22,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     ArrayList<String> urls = new ArrayList<>();
     private MAdapter mAdapter;
     ImageView.ScaleType scaleType = ImageView.ScaleType.CENTER_CROP;
+    RelativeLayout rlImages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         ImageLoaderFactory.set(new GlideLoaderStrategy());
         final GridView grid = (GridView) findViewById(R.id.grid);
         recyclerView = findViewById(R.id.recyclerView);
+        rlImages = findViewById(R.id.rlImages);
 
         baseAdapter = new ImageAdapter(imageUrls, this);
         baseAdapter.setScaleType(scaleType);
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         rgType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                scaleType = checkedId == R.id.rbCenterCrop ? ImageView.ScaleType.CENTER_CROP : checkedId == R.id.rbFitXY ? ImageView.ScaleType.FIT_XY : checkedId == R.id.rbFitCenter ?ImageView.ScaleType.FIT_CENTER: ImageView.ScaleType.CENTER_INSIDE;
+                scaleType = checkedId == R.id.rbCenterCrop ? ImageView.ScaleType.CENTER_CROP : checkedId == R.id.rbFitXY ? ImageView.ScaleType.FIT_XY : checkedId == R.id.rbFitCenter ? ImageView.ScaleType.FIT_CENTER : ImageView.ScaleType.CENTER_INSIDE;
                 imageUrls.add(imgUrl1);
                 baseAdapter.setScaleType(scaleType);
                 mAdapter = new MAdapter(MainActivity.this, recyclerView);
@@ -151,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             public void onClick(View v) {
                 grid.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
+                rlImages.setVisibility(View.GONE);
             }
         });
         findViewById(R.id.recyclerViewBtn).setOnClickListener(new View.OnClickListener() {
@@ -158,6 +162,71 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             public void onClick(View v) {
                 grid.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
+                rlImages.setVisibility(View.GONE);
+            }
+        });
+        final ImageView ivImageA = findViewById(R.id.ivImageA);
+        final ImageView ivImageB = findViewById(R.id.ivImageB);
+        final ImageView ivImageC = findViewById(R.id.ivImageC);
+        final ImageView ivImageD = findViewById(R.id.ivImageD);
+        findViewById(R.id.parentViewBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                grid.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);
+                rlImages.setVisibility(View.VISIBLE);
+                Glide.with(MainActivity.this).load(imgUrl3).into(ivImageA);
+                Glide.with(MainActivity.this).load(imgUrl4).into(ivImageB);
+                Glide.with(MainActivity.this).load(imgUrl5).into(ivImageC);
+                Glide.with(MainActivity.this).load(imgUrl6).into(ivImageD);
+            }
+        });
+        findViewById(R.id.ivImageA).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ImageBrowser.Builder(MainActivity.this)
+                        .urls(imgUrl3,imgUrl4,imgUrl5,imgUrl6)
+                        .targetParent(rlImages)
+                        .imageViewIds(R.id.ivImageA,R.id.ivImageB,R.id.ivImageC,R.id.ivImageD)
+                        .linkage(true)
+                        .position(0)
+                        .show();
+            }
+        });
+        findViewById(R.id.ivImageB).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ImageBrowser.Builder(MainActivity.this)
+                        .urls(imgUrl3,imgUrl4,imgUrl5,imgUrl6)
+                        .targetParent(rlImages)
+                        .imageViewIds(R.id.ivImageA,R.id.ivImageB,R.id.ivImageC,R.id.ivImageD)
+                        .linkage(true)
+                        .position(1)
+                        .show();
+            }
+        });
+        findViewById(R.id.ivImageC).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ImageBrowser.Builder(MainActivity.this)
+                        .urls(imgUrl3,imgUrl4,imgUrl5,imgUrl6)
+                        .targetParent(rlImages)
+                        .imageViewIds(R.id.ivImageA,R.id.ivImageB,R.id.ivImageC,R.id.ivImageD)
+                        .linkage(true)
+                        .position(2)
+                        .show();
+            }
+        });
+        findViewById(R.id.ivImageD).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ImageBrowser.Builder(MainActivity.this)
+                        .urls(imgUrl3,imgUrl4,imgUrl5,imgUrl6)
+                        .targetParent(rlImages)
+                        .imageViewIds(R.id.ivImageA,R.id.ivImageB,R.id.ivImageC,R.id.ivImageD)
+                        .linkage(true)
+                        .position(3)
+                        .show();
             }
         });
         findViewById(R.id.tvColumnCount).setOnClickListener(new View.OnClickListener() {

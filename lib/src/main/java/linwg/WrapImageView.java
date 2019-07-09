@@ -19,7 +19,9 @@ import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
- * Created by wengui on 2016/9/7.
+ *
+ * @author wengui
+ * @date 2016/9/7
  */
 public class WrapImageView {
     IImageLoader imageLoader;
@@ -172,12 +174,12 @@ public class WrapImageView {
                     if ((origin.centerX() - screenWidth / 2) == 0) {
                         transX = 0;
                     } else {
-                        transX = ViewCompat.getTranslationX(thumbImageView) / (origin.centerX() - screenWidth / 2);
+                        transX = thumbImageView.getTranslationX() / (origin.centerX() - screenWidth / 2);
                     }
                     if ((origin.centerY() - screenHeight / 2) == 0) {
                         transY = 0;
                     } else {
-                        transY = ViewCompat.getTranslationY(thumbImageView) / (origin.centerY() - screenHeight / 2);
+                        transY = thumbImageView.getTranslationY() / (origin.centerY() - screenHeight / 2);
                     }
                 }
             });

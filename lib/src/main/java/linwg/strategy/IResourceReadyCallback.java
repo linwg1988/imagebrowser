@@ -1,8 +1,13 @@
 package linwg.strategy;
 
 /**
- * Created by wengui on 2016/9/8.
+ *
+ * @author wengui
+ * @date 2016/9/8
  */
 public interface IResourceReadyCallback {
+    /**
+     * On Resource Ready
+     */
     void onResourceReady();
 }

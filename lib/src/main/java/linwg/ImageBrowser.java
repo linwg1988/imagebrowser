@@ -29,8 +29,9 @@ import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import linwg.org.lib.R;
 import linwg.strategy.ImageLoaderFactory;
@@ -40,7 +41,8 @@ import uk.co.senab.photoview.PhotoView;
 
 
 /**
- * ImageBrowser Created by wengui on 2016/3/9.
+ * @author wengui
+ * @date 2016/3/9
  */
 public class ImageBrowser extends Fragment {
     public static int ANIMATION_DURATION = 400;
@@ -113,7 +115,7 @@ public class ImageBrowser extends Fragment {
     /**
      * The origin viewGroup provide this,if is not null, this array's length is always equals imageView's size.
      */
-    private RectF[] rectFs;
+    private ImageRectFInfo[] rectFs;
     private int customImgRes;
     private int customTextRes;
     /**
@@ -160,7 +162,7 @@ public class ImageBrowser extends Fragment {
             viewDescriptios = savedInstanceState.getStringArrayList(IB_DES);
             position = savedInstanceState.getInt(IB_POSITION);
             thumbUrls = savedInstanceState.getStringArrayList(IB_THUMB_URLS);
-            rectFs = (RectF[]) savedInstanceState.getParcelableArray(IB_LOCATIONS);
+            rectFs = (ImageRectFInfo[]) savedInstanceState.getParcelableArray(IB_LOCATIONS);
             customImgRes = savedInstanceState.getInt(IB_CUSTOM_IMG_RES);
             customTextRes = savedInstanceState.getInt(IB_CUSTOM_TEXT_RES);
             customChar = savedInstanceState.getCharSequence(IB_CUSTOM_TEXT);
@@ -174,7 +176,7 @@ public class ImageBrowser extends Fragment {
             viewDescriptios = arguments.getStringArrayList(IB_DES);
             position = arguments.getInt(IB_POSITION);
             thumbUrls = arguments.getStringArrayList(IB_THUMB_URLS);
-            rectFs = (RectF[]) arguments.getParcelableArray(IB_LOCATIONS);
+            rectFs = (ImageRectFInfo[]) arguments.getParcelableArray(IB_LOCATIONS);
             customImgRes = arguments.getInt(IB_CUSTOM_IMG_RES);
             customTextRes = arguments.getInt(IB_CUSTOM_TEXT_RES);
             customChar = arguments.getCharSequence(IB_CUSTOM_TEXT);
@@ -194,7 +196,7 @@ public class ImageBrowser extends Fragment {
             int systemWindowInsetBottom = decorView.getRootWindowInsets().getSystemWindowInsetBottom();
             if (systemWindowInsetBottom != 0 && rectFs != null) {
                 for (int i = 0; i < rectFs.length; i++) {
-                    rectFs[i].offset(0, -systemWindowInsetBottom / 2);
+                    rectFs[i].rectF.offset(0, -systemWindowInsetBottom / 2);
                 }
             }
         }
@@ -236,108 +238,26 @@ public class ImageBrowser extends Fragment {
         ObjectAnimator.ofFloat(shadowView, "alpha", 0.1f).setDuration(ANIMATION_DURATION).start();
     }
 
-    public void initView(View view) {
+    private void initView(View view) {
         shadowView = view.findViewById(R.id.shadow);
-        ivDownLoad = (ImageView) view.findViewById(R.id.ivDownLoad);
-        ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
-        ivCustom = (ImageView) view.findViewById(R.id.ivCustom);
-        tvCustom = (TextView) view.findViewById(R.id.tvCustom);
+        ivDownLoad = view.findViewById(R.id.ivDownLoad);
+        ivDelete = view.findViewById(R.id.ivDelete);
+        ivCustom = view.findViewById(R.id.ivCustom);
+        tvCustom = view.findViewById(R.id.tvCustom);
         ObjectAnimator.ofFloat(shadowView, "alpha", 1f).setDuration(ANIMATION_DURATION).start();
-        viewList.clear();
-        for (int i = 0; i < imageUrls.size(); i++) {
-            View imageLayout = getActivity().getLayoutInflater().inflate(R.layout.item_image_browser, null);
-            final View iv_thumbnail = imageLayout.findViewById(R.id.iv_thumbnail);
-            final ViewGroup.LayoutParams params = iv_thumbnail.getLayoutParams();
-            //init thumb size of thumb imageview
-            if (thumbSize == 0) {
-                params.height = (int) rectFs[i].height();
-                params.width = (int) rectFs[i].width();
-            } else {
-                params.height = thumbSize;
-                params.width = thumbSize;
-            }
+        fillingViewList();
+        customButtonStyle();
 
-            iv_thumbnail.setLayoutParams(params);
-            WrapImageView wrapImageView = new WrapImageView(this, imageLayout, imageUrls.get(i), thumbUrls == null ? null : thumbUrls.get(i),
-                    rectFs == null ? null : rectFs[i], i == position, screenWidth, screenHeight, ImageView.ScaleType.valueOf(scaleTypeName));
-            viewList.add(wrapImageView);
-        }
-
-        switch (mode) {
-            case Mode.CUSTOM:
-                if (customImgRes != 0) {
-                    ivCustom.setVisibility(View.VISIBLE);
-                    ivCustom.setOnClickListener(mCustomImgClickListener);
-                }
-                if (customTextRes != 0) {
-                    tvCustom.setVisibility(View.VISIBLE);
-                    tvCustom.setText(customTextRes);
-                    tvCustom.setOnClickListener(mCustomTxtClickListener);
-                }
-                if (!TextUtils.isEmpty(customChar)) {
-                    tvCustom.setVisibility(View.VISIBLE);
-                    tvCustom.setText(customChar);
-                    tvCustom.setOnClickListener(mCustomTxtClickListener);
-                }
-                break;
-            case Mode.NONE:
-                ivDownLoad.setVisibility(View.GONE);
-                ivDelete.setVisibility(View.GONE);
-                ivCustom.setVisibility(View.GONE);
-                tvCustom.setVisibility(View.GONE);
-                break;
-            case Mode.DELETE:
-                ivDelete.setVisibility(View.VISIBLE);
-                ivDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mOnDeleteClickListener != null) {
-                            new AlertDialog.Builder(getActivity()).setTitle(R.string.delete_alert)
-                                    .setMessage(R.string.delete_message).setPositiveButton(R.string.sure, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    removeCurrent();
-                                    if (imageUrls.size() == 0) {
-                                        ImageBrowser.this.dismissWithoutAnimation();
-                                    }
-                                    dialog.cancel();
-                                }
-                            }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            }).create().show();
-                        }
-                    }
-                });
-                break;
-            case Mode.DOWNLOAD:
-                ivDownLoad.setVisibility(View.VISIBLE);
-                ivDownLoad.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mOnDownloadClickListener != null) {
-                            final PhotoView view = viewList.get(position).getPhotoView();
-                            if (ImageLoaderFactory.get().isDrawableLoadingCompleted(view)) {
-                                mOnDownloadClickListener.onDownloadBtnClick(ImageLoaderFactory.get().getBitmapFromImageView(view));
-                            }
-                        }
-                    }
-                });
-                break;
-        }
-
-        HackyViewPager mViewPager = (HackyViewPager) view.findViewById(R.id.vp_image);
+        HackyViewPager mViewPager = view.findViewById(R.id.vp_image);
         mViewPager.setOffscreenPageLimit(1);
         imagePagerAdapter = new ImagePagerAdapter();
         mViewPager.setAdapter(imagePagerAdapter);
         mViewPager.setCurrentItem(position);
 
-        tvIndicator = (TextView) view.findViewById(R.id.tvIndicator);
-        tvTitle = (TextView) view.findViewById(R.id.tvTitle);
-        tvDescriptions = (TextView) view.findViewById(R.id.tvDescriptions);
-        circlePageIndicator = (CirclePageIndicator) view.findViewById(R.id.indicator);
+        tvIndicator = view.findViewById(R.id.tvIndicator);
+        tvTitle = view.findViewById(R.id.tvTitle);
+        tvDescriptions = view.findViewById(R.id.tvDescriptions);
+        circlePageIndicator = view.findViewById(R.id.indicator);
 
         tvTitle.setText(getDes(position));
 
@@ -401,21 +321,21 @@ public class ImageBrowser extends Fragment {
 
                 ImageBrowser.this.position = position;
                 if (builder != null && builder.linkage && rectFs != null) {
-                    RectF rectF = rectFs[position];
+                    RectF rectF = rectFs[position].rectF;
                     int[] parentLocation = new int[2];
                     builder.parent.getLocationOnScreen(parentLocation);
                     RectF parentRectF = new RectF(parentLocation[0], parentLocation[1], parentLocation[0] + builder.parent.getWidth(), parentLocation[1] + builder.parent.getHeight());
                     if (rectF.bottom > parentRectF.bottom) {
                         float offset = rectF.bottom - parentRectF.bottom - builder.viewRectFInfo.bottomOffset;
                         for (int i = 0; i < rectFs.length; i++) {
-                            rectFs[i].offset(0, -offset);
+                            rectFs[i].rectF.offset(0, -offset);
                         }
                         performScrollToBottom(builder.parent, offset, position);
                     }
                     if (rectF.top < parentRectF.top) {
                         float offset = parentRectF.top - rectF.top + builder.viewRectFInfo.topOffset;
                         for (int i = 0; i < rectFs.length; i++) {
-                            rectFs[i].offset(0, offset);
+                            rectFs[i].rectF.offset(0, offset);
                         }
                         performScrollToTop(builder.parent, offset, position);
                     }
@@ -432,6 +352,96 @@ public class ImageBrowser extends Fragment {
 
             }
         });
+    }
+
+    private void fillingViewList() {
+        viewList.clear();
+        for (int i = 0; i < imageUrls.size(); i++) {
+            View imageLayout = getActivity().getLayoutInflater().inflate(R.layout.item_image_browser, null);
+            final View ivThumbnail = imageLayout.findViewById(R.id.iv_thumbnail);
+            final ViewGroup.LayoutParams params = ivThumbnail.getLayoutParams();
+            //init thumb size of thumb imageView
+            if (thumbSize == 0) {
+                params.height = (int) rectFs[i].rectF.height();
+                params.width = (int) rectFs[i].rectF.width();
+            } else {
+                params.height = thumbSize;
+                params.width = thumbSize;
+            }
+
+            ivThumbnail.setLayoutParams(params);
+            WrapImageView wrapImageView = new WrapImageView(this, imageLayout, imageUrls.get(i), thumbUrls == null ? null : thumbUrls.get(i),
+                    rectFs == null ? null : rectFs[i].rectF, i == position, screenWidth, screenHeight, ImageView.ScaleType.valueOf(rectFs == null ? scaleTypeName : rectFs[i].scaleType));
+            viewList.add(wrapImageView);
+        }
+    }
+
+    private void customButtonStyle() {
+        switch (mode) {
+            case Mode.CUSTOM:
+                if (customImgRes != 0) {
+                    ivCustom.setVisibility(View.VISIBLE);
+                    ivCustom.setOnClickListener(mCustomImgClickListener);
+                }
+                if (customTextRes != 0) {
+                    tvCustom.setVisibility(View.VISIBLE);
+                    tvCustom.setText(customTextRes);
+                    tvCustom.setOnClickListener(mCustomTxtClickListener);
+                }
+                if (!TextUtils.isEmpty(customChar)) {
+                    tvCustom.setVisibility(View.VISIBLE);
+                    tvCustom.setText(customChar);
+                    tvCustom.setOnClickListener(mCustomTxtClickListener);
+                }
+                break;
+            case Mode.NONE:
+                ivDownLoad.setVisibility(View.GONE);
+                ivDelete.setVisibility(View.GONE);
+                ivCustom.setVisibility(View.GONE);
+                tvCustom.setVisibility(View.GONE);
+                break;
+            case Mode.DELETE:
+                ivDelete.setVisibility(View.VISIBLE);
+                ivDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mOnDeleteClickListener != null) {
+                            new AlertDialog.Builder(getActivity()).setTitle(R.string.delete_alert)
+                                    .setMessage(R.string.delete_message).setPositiveButton(R.string.sure, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    removeCurrent();
+                                    if (imageUrls.size() == 0) {
+                                        ImageBrowser.this.dismissWithoutAnimation();
+                                    }
+                                    dialog.cancel();
+                                }
+                            }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }).create().show();
+                        }
+                    }
+                });
+                break;
+            case Mode.DOWNLOAD:
+                ivDownLoad.setVisibility(View.VISIBLE);
+                ivDownLoad.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mOnDownloadClickListener != null) {
+                            final PhotoView view = viewList.get(position).getPhotoView();
+                            if (ImageLoaderFactory.get().isDrawableLoadingCompleted(view)) {
+                                mOnDownloadClickListener.onDownloadBtnClick(ImageLoaderFactory.get().getBitmapFromImageView(view));
+                            }
+                        }
+                    }
+                });
+                break;
+            default:
+        }
     }
 
     public void setIndicatorPaddingBottom(final int paddingBottom) {
@@ -528,12 +538,26 @@ public class ImageBrowser extends Fragment {
     }
 
     public interface OnPhotoLongClickListener {
+        /**
+         * Long press click event callback
+         *
+         * @param browser  Browser object
+         * @param position Click index
+         */
         void handlerLongClick(ImageBrowser browser, int position);
     }
 
-    public interface OnShowingClickListener {
+    private interface OnShowingClickListener {
+        /**
+         * This is setting for ImageBrowser showing callback.
+         */
         void onShowing();
 
+        /**
+         * Image index to be displayed
+         *
+         * @param position The urls' index
+         */
         void onChildChange(int position);
     }
 
@@ -556,6 +580,7 @@ public class ImageBrowser extends Fragment {
         ViewGroup parent;
         ViewRectFInfo viewRectFInfo;
         int imageViewId;
+        int[] imageViewIds;
         private OnDownloadClickListener downloadListener;
         private OnDeleteClickListener deleteListener;
         private View.OnClickListener customImgListener;
@@ -578,8 +603,9 @@ public class ImageBrowser extends Fragment {
         }
 
         public Builder url(String url) {
-            if (urls == null)
+            if (urls == null) {
                 urls = new ArrayList<>();
+            }
             urls.clear();
             urls.add(url);
             position = 0;
@@ -587,8 +613,9 @@ public class ImageBrowser extends Fragment {
         }
 
         public Builder thumbUrl(String thumbUrl) {
-            if (thumbUrls == null)
+            if (thumbUrls == null) {
                 thumbUrls = new ArrayList<>();
+            }
             thumbUrls.clear();
             thumbUrls.add(thumbUrl);
             return this;
@@ -601,6 +628,11 @@ public class ImageBrowser extends Fragment {
 
         public Builder urls(ArrayList<String> urls) {
             this.urls = urls;
+            return this;
+        }
+
+        public Builder urls(String... urls) {
+            this.urls = new ArrayList<>(Arrays.asList(urls));
             return this;
         }
 
@@ -624,6 +656,9 @@ public class ImageBrowser extends Fragment {
             return this;
         }
 
+        /**
+         * Now it seems very important if we want the animation is playing correct.
+         * */
         public Builder position(int index) {
             this.position = index;
             return this;
@@ -645,17 +680,31 @@ public class ImageBrowser extends Fragment {
         }
 
         /**
+         * If your images are not showing in a recycler view or list view,so the views' ids are different,you can set the ids by this method.
+         * Once you use this means that {@link #imageViewId(int)} will not effect.
+         */
+        public Builder imageViewIds(int... imageViewIds) {
+            this.imageViewIds = imageViewIds;
+            return this;
+        }
+
+        /**
+         * From V1.2.0 this property will obtain from parent view if the parent view and the position has been set.
          * Write by the past date:Once I call this is want to set the origin view's alpha so the animation will be playing like the origin view is
          * really moving.But it works bad,so just ignore this method. (ps:HaHa...I just suppose one day I'll make it work,so I didn't delete it.)
          * <p>
          * Note :I hide the target image view when the photo view on animation start by set it's alpha to 0. And change the child's reference
          * after the viewpager on selected.OK! Now it works.
          */
+        @Deprecated
         public Builder target(View child) {
             this.child = child;
             return this;
         }
 
+        /**
+         * From V1.2.0 this property will obtain from target imageView if the imageViewId has being set.So it is not required.
+         */
         public Builder scaleType(ImageView.ScaleType scaleType) {
             this.scaleType = scaleType;
             return this;
@@ -701,12 +750,19 @@ public class ImageBrowser extends Fragment {
                 } else if (parent instanceof AbsListView) {
                     viewRectFInfo = AbsListViewHelper.measureChild((AbsListView) parent, imageViewId);
                 } else {
-                    viewRectFInfo = ViewGroupHelper.measureChild(parent, imageViewId);
+                    if (imageViewIds != null && imageViewIds.length > 0) {
+                        viewRectFInfo = ViewGroupHelper.measureChild(parent, imageViewIds);
+                    } else {
+                        viewRectFInfo = ViewGroupHelper.measureChild(parent, imageViewId);
+                    }
+                }
+                if(child == null){
+                    child = findChild(position);
                 }
             }
 
             if (thumbSize == 0 && viewRectFInfo != null && viewRectFInfo.imgLocations != null) {
-                thumbSize = (int) viewRectFInfo.imgLocations[0].width();
+                thumbSize = (int) viewRectFInfo.imgLocations[0].rectF.width();
             }
 
             final ImageBrowser imageBrowser = new ImageBrowser();
@@ -759,15 +815,23 @@ public class ImageBrowser extends Fragment {
 
         void changeChild(int position) {
             child.setAlpha(1);
-            if (parent instanceof AbsListView) {
-                child = AbsListViewHelper.findChildByPosition((AbsListView) parent, imageViewId, position);
-            } else if (parent instanceof RecyclerView) {
-                child = RecyclerViewHelper.findChildByPosition((RecyclerView) parent, imageViewId, position);
-            } else {
-                child = ViewGroupHelper.findChildByPosition(parent, imageViewId, position);
-            }
+            child = findChild(position);
             if (child != null) {
                 child.setAlpha(0);
+            }
+        }
+
+        private View findChild(int position){
+            if (parent instanceof AbsListView) {
+                return AbsListViewHelper.findChildByPosition((AbsListView) parent, imageViewId, position);
+            } else if (parent instanceof RecyclerView) {
+                return RecyclerViewHelper.findChildByPosition((RecyclerView) parent, imageViewId, position);
+            } else {
+                if (imageViewIds != null && imageViewIds.length > 0) {
+                    return ViewGroupHelper.findChildByPosition(parent, imageViewIds, position);
+                } else {
+                    return ViewGroupHelper.findChildByPosition(parent, imageViewId, position);
+                }
             }
         }
     }
@@ -841,14 +905,28 @@ public class ImageBrowser extends Fragment {
     }
 
     public interface OnDownloadClickListener {
+        /**
+         * 下载按钮点击事件回调
+         *
+         * @param bitmap 位图
+         */
         void onDownloadBtnClick(Bitmap bitmap);
     }
 
     public interface OnDeleteClickListener {
+        /**
+         * 删除按钮点击事件回调
+         *
+         * @param index 图片索引
+         * @param url   图片地址
+         */
         void onClick(int index, String url);
     }
 
     public interface OnDismissListener {
+        /**
+         * 浏览器关闭时的回调
+         */
         void onDismiss();
     }
 

@@ -8,7 +8,7 @@ import android.view.WindowManager;
 /**
  * Created by wengui on 2016/9/8.
  */
-public class Util {
+class Util {
     private Util() {
     }
 
