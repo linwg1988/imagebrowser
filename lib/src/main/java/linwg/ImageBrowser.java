@@ -658,7 +658,7 @@ public class ImageBrowser extends Fragment {
 
         /**
          * Now it seems very important if we want the animation is playing correct.
-         * */
+         */
         public Builder position(int index) {
             this.position = index;
             return this;
@@ -695,8 +695,8 @@ public class ImageBrowser extends Fragment {
          * <p>
          * Note :I hide the target image view when the photo view on animation start by set it's alpha to 0. And change the child's reference
          * after the viewpager on selected.OK! Now it works.
+         * After ver 1.2.1.if we just want this work on a single image view ,just call this method and all things are being ok.
          */
-        @Deprecated
         public Builder target(View child) {
             this.child = child;
             return this;
@@ -756,8 +756,12 @@ public class ImageBrowser extends Fragment {
                         viewRectFInfo = ViewGroupHelper.measureChild(parent, imageViewId);
                     }
                 }
-                if(child == null){
+                if (child == null) {
                     child = findChild(position);
+                }
+            } else {
+                if (child != null) {
+                    viewRectFInfo = ViewHelper.measureChild(child);
                 }
             }
 
@@ -790,7 +794,9 @@ public class ImageBrowser extends Fragment {
                 imageBrowser.setOnDismissListener(new OnDismissListener() {
                     @Override
                     public void onDismiss() {
-                        child.setAlpha(1);
+                        if (child != null) {
+                            child.setAlpha(1);
+                        }
                     }
                 });
                 imageBrowser.setOnShowingListener(new OnShowingClickListener() {
@@ -801,7 +807,9 @@ public class ImageBrowser extends Fragment {
 
                     @Override
                     public void onChildChange(int position) {
-                        changeChild(position);
+                        if (parent != null) {
+                            changeChild(position);
+                        }
                     }
                 });
             }
@@ -821,7 +829,10 @@ public class ImageBrowser extends Fragment {
             }
         }
 
-        private View findChild(int position){
+        private View findChild(int position) {
+            if (parent == null) {
+                return null;
+            }
             if (parent instanceof AbsListView) {
                 return AbsListViewHelper.findChildByPosition((AbsListView) parent, imageViewId, position);
             } else if (parent instanceof RecyclerView) {

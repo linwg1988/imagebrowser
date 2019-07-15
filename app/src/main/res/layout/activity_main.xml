@@ -9,6 +9,7 @@
         android:id="@+id/rlLocal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:orientation="vertical">
 
         <FrameLayout
@@ -191,4 +192,9 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivSingle"
+        android:layout_width="200dp"
+        android:layout_height="200dp" />
 </RelativeLayout>

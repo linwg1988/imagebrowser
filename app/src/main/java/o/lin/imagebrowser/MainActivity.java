@@ -244,6 +244,17 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                 }).show();
             }
         });
+
+        ImageView ivSingle = findViewById(R.id.ivSingle);
+        Glide.with(this).load(imgUrl3).into(ivSingle);
+        ivSingle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ImageBrowser.Builder(MainActivity.this)
+                        .urls(imgUrl3).target(v)
+                        .show();
+            }
+        });
     }
 
     static class MAdapter extends RecyclerView.Adapter<VH> {

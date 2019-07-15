@@ -7,7 +7,7 @@
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.2.0'
+    compile 'org.linwg1988:imagebrowser:1.2.1'
 }
 ~~~
 支持图片列表类型为RecyclerView，ListView和GridView。在相对复杂的列表子项中提供ImageView的id配置，<br>
@@ -111,6 +111,8 @@ new ImageBrowser.Builder(MainActivity.this)
 对于手机底部导航栏影响指示器的显示提供了设置底部指示器内间距的方法使用setIndicatorPaddingBottom(int paddingBottom)<br>
 #1.2.0
 Gradle版本升级到4.1.1, Glide版本到4.9.0<br>
+#1.2.1
+简化单张图片点击浏览的api，只需要设置url以及target即可.<br>
 
 最后上一下效果图：<br>
 ![](http://ofj4ai6ke.bkt.clouddn.com/local.gif)<br>
