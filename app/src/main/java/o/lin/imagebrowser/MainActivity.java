@@ -3,10 +3,14 @@ package o.lin.imagebrowser;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,8 +31,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestFutureTarget;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 
 import org.wglin.imagepicker.ImageLoader;
 import org.wglin.imagepicker.ImagePicker;
@@ -245,14 +254,22 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
             }
         });
 
-        ImageView ivSingle = findViewById(R.id.ivSingle);
-        Glide.with(this).load(imgUrl3).into(ivSingle);
+        final ImageView ivSingle = findViewById(R.id.ivSingle);
+        Glide.with(this).load(imgUrl4).into(ivSingle);
+
+
         ivSingle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new ImageBrowser.Builder(MainActivity.this)
-                        .urls(imgUrl3).target(v)
+                        .urls(imgUrl4).target(v)
                         .show();
+//                Intent intent = new Intent(MainActivity.this, ActivityTransitionToActivity.class);
+//                ActivityOptionsCompat options = ActivityOptionsCompat.
+//                        makeSceneTransitionAnimation(MainActivity.this, ivSingle, getString(R.string.transition_test));
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                    startActivity(intent, options.toBundle());
+//                }
             }
         });
     }

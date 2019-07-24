@@ -16,7 +16,13 @@ class RecyclerViewHelper {
     public static ViewRectFInfo measureChild(RecyclerView recyclerView, int imageViewId) {
         ViewRectFInfo viewRectFInfo = new ViewRectFInfo();
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager == null) {
+            return null;
+        }
         int viewCount = layoutManager.getChildCount();
+        if (viewCount == 0) {
+            return null;
+        }
         int dataCount = layoutManager.getItemCount();
         int numColumns = 1;
         if (layoutManager instanceof GridLayoutManager) {
@@ -31,8 +37,8 @@ class RecyclerViewHelper {
             //Maybe the imageView is contains by the itemView of ViewGroup ,we need measure offset.
             int[] imgLocate = new int[2];
             int[] itemLocate = new int[2];
-            View imageView = layoutManager.getChildAt(0);
-            View itemView = layoutManager.getChildAt(0).findViewById(imageViewId);
+            View itemView = layoutManager.getChildAt(0);
+            View imageView = itemView.findViewById(imageViewId);
             if (imageView == null) {
                 throw new IllegalStateException("The item of RecyclerView#" + recyclerView.getId() + " does not contains Id #" + imageViewId + ".");
             }

@@ -79,7 +79,7 @@ public class WrapImageView {
         this.screenHeight = screenHeight;
         this.isStartTargetView = isStartView;
         this.targetView = targetView;
-        mProgressBar = (ProgressBar) targetView.findViewById(R.id.pb_img_detail);
+        mProgressBar =  targetView.findViewById(R.id.pb_img_detail);
         mProgressBar.setVisibility(View.GONE);
         this.url = url;
         this.thumbUrl = thumbUrl;
@@ -88,8 +88,8 @@ public class WrapImageView {
             origin = new RectF(screenWidth / 2, screenHeight / 2, screenWidth / 2, screenHeight / 2);
         }
         this.origin = origin;
-        this.thumbImageView = (ImageView) targetView.findViewById(R.id.iv_thumbnail);
-        this.photoView = (PhotoView) targetView.findViewById(R.id.photo_view);
+        this.thumbImageView =  targetView.findViewById(R.id.iv_thumbnail);
+        this.photoView =  targetView.findViewById(R.id.photo_view);
         thumbWidth = thumbImageView.getLayoutParams().width;
 
         scale = thumbWidth / screenWidth;
@@ -111,9 +111,10 @@ public class WrapImageView {
     }
 
     public void startLoading() {
-        if (!isOriginMiss) {
-            thumbImageView.setScaleType(originScaleType);
-        }
+//        if (!isOriginMiss) {
+//            thumbImageView.setScaleType(originScaleType);
+//        }
+//        startPhotoAnimation();
         imageLoader.loadImage(targetView.getContext(), url, photoView, new IResourceReadyCallback() {
             @Override
             public void onResourceReady() {
@@ -126,17 +127,17 @@ public class WrapImageView {
             }
         });
 
-        IResourceReadyCallback thumbCallback = new IResourceReadyCallback() {
-            @Override
-            public void onResourceReady() {
-                if (!hasThumbPlaying && isStartTargetView && !hasPhotoPlaying) {
-                    startThumbAnimation();
-                }
-            }
-        };
-        if (!imageLoader.loadThumb(targetView.getContext(), url, thumbUrl, thumbImageView, thumbCallback)) {
-            imageLoader.loadImage(targetView.getContext(), thumbUrl, thumbImageView, thumbCallback);
-        }
+//        IResourceReadyCallback thumbCallback = new IResourceReadyCallback() {
+//            @Override
+//            public void onResourceReady() {
+//                if (!hasThumbPlaying && isStartTargetView && !hasPhotoPlaying) {
+//                    startThumbAnimation();
+//                }
+//            }
+//        };
+//        if (!imageLoader.loadThumb(targetView.getContext(), url, thumbUrl, thumbImageView, thumbCallback)) {
+//            imageLoader.loadImage(targetView.getContext(), thumbUrl, thumbImageView, thumbCallback);
+//        }
     }
 
     float transX = 1;

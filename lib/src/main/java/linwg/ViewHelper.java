@@ -4,6 +4,9 @@ import android.graphics.RectF;
 import android.view.View;
 import android.widget.ImageView;
 
+/**
+ * @author adr
+ */
 public class ViewHelper {
     static ViewRectFInfo measureChild(View child) {
         ViewRectFInfo viewRectFInfo = new ViewRectFInfo();
@@ -12,7 +15,7 @@ public class ViewHelper {
         child.getLocationOnScreen(locate);
         viewRectFInfo.imgLocations[0] = new ImageRectFInfo();
         viewRectFInfo.imgLocations[0].rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
-        viewRectFInfo.imgLocations[0].scaleType = ImageView.ScaleType.MATRIX.name();
+        viewRectFInfo.imgLocations[0].scaleType = ((ImageView)child).getScaleType().name();
         return viewRectFInfo;
     }
 }

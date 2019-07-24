@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -31,7 +32,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import linwg.org.lib.R;
 import linwg.strategy.ImageLoaderFactory;
@@ -326,14 +326,14 @@ public class ImageBrowser extends Fragment {
                     builder.parent.getLocationOnScreen(parentLocation);
                     RectF parentRectF = new RectF(parentLocation[0], parentLocation[1], parentLocation[0] + builder.parent.getWidth(), parentLocation[1] + builder.parent.getHeight());
                     if (rectF.bottom > parentRectF.bottom) {
-                        float offset = rectF.bottom - parentRectF.bottom - builder.viewRectFInfo.bottomOffset;
+                        float offset = rectF.bottom + builder.viewRectFInfo.bottomOffset - parentRectF.bottom;
                         for (int i = 0; i < rectFs.length; i++) {
                             rectFs[i].rectF.offset(0, -offset);
                         }
                         performScrollToBottom(builder.parent, offset, position);
                     }
                     if (rectF.top < parentRectF.top) {
-                        float offset = parentRectF.top - rectF.top + builder.viewRectFInfo.topOffset;
+                        float offset = parentRectF.top - builder.viewRectFInfo.topOffset - rectF.top;
                         for (int i = 0; i < rectFs.length; i++) {
                             rectFs[i].rectF.offset(0, offset);
                         }

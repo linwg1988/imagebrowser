@@ -29,29 +29,29 @@ public class GlideLoaderStrategy implements IImageLoader{
         return isLoadingCompleted(view);
     }
 
-    @Override
-    public boolean loadThumb(final Context context, String originUrl, String thumbUrl, final ImageView imageView, final IResourceReadyCallback callback) {
-        if(thumbUrl == null){
-            RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
-
-            Glide.with(context).asBitmap().load(originUrl).apply(options).listener(new RequestListener<Bitmap>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                    imageView.setImageDrawable(new BitmapDrawable(context.getResources(),resource));
-                    callback.onResourceReady();
-                    return true;
-                }
-            }).into(imageView);
-        }else{
-            loadImage(context,thumbUrl,imageView,callback);
-        }
-        return true;
-    }
+//    @Override
+//    public boolean loadThumb(final Context context, String originUrl, String thumbUrl, final ImageView imageView, final IResourceReadyCallback callback) {
+//        if(thumbUrl == null){
+//            RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
+//
+//            Glide.with(context).asBitmap().load(originUrl).apply(options).listener(new RequestListener<Bitmap>() {
+//                @Override
+//                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+//                    return false;
+//                }
+//
+//                @Override
+//                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+//                    imageView.setImageDrawable(new BitmapDrawable(context.getResources(),resource));
+//                    callback.onResourceReady();
+//                    return true;
+//                }
+//            }).into(imageView);
+//        }else{
+//            loadImage(context,thumbUrl,imageView,callback);
+//        }
+//        return true;
+//    }
 
     @Override
     public Bitmap getBitmapFromImageView(ImageView view) {

@@ -26,16 +26,16 @@ public interface IImageLoader {
      */
     boolean isDrawableLoadingCompleted(ImageView view);
 
-    /**
-     * Load thumb image.
-     * @param context context
-     * @param originUrl originUrl
-     * @param thumbUrl thumbUrl
-     * @param imageView imageView
-     * @param callback callback
-     * @return b if false, the WrapImageView will call {@link #loadImage(Context, String, ImageView, IResourceReadyCallback)} to download thumb image.
-     */
-    boolean loadThumb(Context context,String originUrl,String thumbUrl,ImageView imageView,IResourceReadyCallback callback);
+//    /**
+//     * Load thumb image.
+//     * @param context context
+//     * @param originUrl originUrl
+//     * @param thumbUrl thumbUrl
+//     * @param imageView imageView
+//     * @param callback callback
+//     * @return b if false, the WrapImageView will call {@link #loadImage(Context, String, ImageView, IResourceReadyCallback)} to download thumb image.
+//     */
+//    boolean loadThumb(Context context,String originUrl,String thumbUrl,ImageView imageView,IResourceReadyCallback callback);
 
     /**
      * Get a bitmap from target view.
