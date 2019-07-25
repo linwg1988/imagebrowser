@@ -7,7 +7,7 @@ gradled中的引用：
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.2.2'
+    compile 'org.linwg1988:imagebrowser:1.2.3'
 }
 ~~~
 支持图片列表类型为RecyclerView，ListView和GridView。在相对复杂的列表子项中提供ImageView的id配置，<br>
@@ -114,6 +114,8 @@ Gradle版本升级到4.1.1, Glide版本到4.9.0<br>
 #1.2.2
 修复RecycleView的直接itemView不是ImageView时解析图片位置的错误，修复RecycleView动画位置异常的bug，去除缩略图动画，使初始动画更加平滑.<br>
 因为去除了缩略图占位，所以加载原图是网络大图时可能比较慢，除非该图片原图已经在本地缓存已经存在.<br>
+#1.2.3
+修复动画初始取值错误的问题<br>
 
 最后上一下效果图：<br>
 ![](http://ofj4ai6ke.bkt.clouddn.com/local.gif)<br>

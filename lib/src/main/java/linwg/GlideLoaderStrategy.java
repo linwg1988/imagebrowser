@@ -3,6 +3,8 @@ package linwg;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
@@ -12,17 +14,18 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 
 import linwg.strategy.IImageLoader;
 import linwg.strategy.IResourceReadyCallback;
 
 /**
- *
  * @author wengui
  * @date 2016/9/8
  */
-public class GlideLoaderStrategy implements IImageLoader{
+public class GlideLoaderStrategy implements IImageLoader {
 
     @Override
     public boolean isDrawableLoadingCompleted(ImageView view) {
@@ -58,25 +61,35 @@ public class GlideLoaderStrategy implements IImageLoader{
         return ((BitmapDrawable) view.getDrawable()).getBitmap();
     }
 
-    private static boolean isLoadingCompleted(ImageView view){
+    private static boolean isLoadingCompleted(ImageView view) {
         return view.getDrawable() != null;
     }
 
     @Override
     public void loadImage(final Context context, String url, final ImageView imageView, final IResourceReadyCallback callback) {
-        RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
-        Glide.with(context).asBitmap().load(url).apply(options).listener(new RequestListener<Bitmap>() {
+        final RequestOptions options = RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL);
+        Glide.with(context).asBitmap().load(url).apply(options).into(new CustomTarget<Bitmap>() {
             @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                return false;
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition transition) {
+                Glide.with(context).asBitmap().load(resource).addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        imageView.setImageDrawable(new BitmapDrawable(context.getResources(), resource));
+                        callback.onResourceReady();
+                        return true;
+                    }
+                }).into(imageView);
             }
 
             @Override
-            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                imageView.setImageDrawable(new BitmapDrawable(context.getResources(),resource));
-                callback.onResourceReady();
-                return true;
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
             }
-        }).into(imageView);
+        });
     }
 }

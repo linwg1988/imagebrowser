@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 6
+        versionName "1.0.5"
     }
     buildTypes {
         release {
@@ -37,7 +37,7 @@ publish {
     userOrg = 'linwg1988'
     groupId = 'org.linwg1988'
     artifactId = 'imagebrowser'
-    publishVersion = '1.2.2'
+    publishVersion = '1.2.3'
     desc = 'A libary uses for browsing image detail.'
     website = 'https://github.com/linwg1988/imagebrowser'
 }

@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
     String imgUrl77 = "http://img5.duitang.com/uploads/item/201412/29/20141229095634_mBmFj.jpeg";
     String imgUrl88 = "http://imgsrc.baidu.com/forum/w%3D580%3Bcp%3Dtieba%2C10%2C484%3Bap%3D%C3%C9%B3%F5%D6%AE%B4%CD%B0%C9%2C90%2C492/sign=56d4c57bf11f3a295ac8d5c6a91edf41/a8ec8a13632762d02d83c01aa1ec08fa503dc6d2.jpg";
     String imgUrl99 = "http://imgsrc.baidu.com/forum/w%3D580%3B/sign=9f1bb672f91986184147ef8c7ad62e73/09fa513d269759ee116d53d8b3fb43166d22dfe7.jpg";
+    String imgUrl100 = "http://static.test.lsyc.yssc-cloud.com/review-img/lsyc/2019/07/16/8d83c2f5a346770e0c3a481685de18dd.jpg";
     RecyclerView recyclerView;
     ArrayList<String> urls = new ArrayList<>();
     private MAdapter mAdapter;
@@ -92,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
         final GridView grid = (GridView) findViewById(R.id.grid);
         recyclerView = findViewById(R.id.recyclerView);
         rlImages = findViewById(R.id.rlImages);
-
         baseAdapter = new ImageAdapter(imageUrls, this);
         baseAdapter.setScaleType(scaleType);
         grid.setAdapter(baseAdapter);
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements ImagePicker.OnIma
                 urls.add(imgUrl77);
                 urls.add(imgUrl88);
                 urls.add(imgUrl99);
+                urls.add(imgUrl100);
                 imageUrls.clear();
                 imageUrls.addAll(urls);
                 baseAdapter.setImageUrls(urls);

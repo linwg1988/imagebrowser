@@ -26,11 +26,8 @@ public class PhotoViewAttacherCompat extends PhotoViewAttacher {
         if (imageView != null) {
             Drawable d = imageView.getDrawable();
             if (null != d) {
-                int intrinsicHeight = d.getIntrinsicHeight();
-                int intrinsicWidth = d.getIntrinsicWidth();
-
-                int dwidth = intrinsicHeight;
-                int dheight = intrinsicWidth;
+                int dwidth = d.getIntrinsicWidth();
+                int dheight = d.getIntrinsicHeight();
                 int vwidth = (int) target.width();
                 int vheight = (int) target.height();
                 float scale;
@@ -80,11 +77,8 @@ public class PhotoViewAttacherCompat extends PhotoViewAttacher {
 
     public void fromRectF(RectF target) {
         Drawable d = getImageView().getDrawable();
-        int intrinsicHeight = d.getIntrinsicHeight();
-        int intrinsicWidth = d.getIntrinsicWidth();
-
-        int dwidth = intrinsicHeight;
-        int dheight = intrinsicWidth;
+        int dwidth = d.getIntrinsicWidth();
+        int dheight = d.getIntrinsicHeight();
         int vwidth = (int) target.width();
         int vheight = (int) target.height();
         float scale;
@@ -128,20 +122,18 @@ public class PhotoViewAttacherCompat extends PhotoViewAttacher {
 
     public void fromFitXYRectF(RectF target) {
         Drawable d = getImageView().getDrawable();
-        int intrinsicHeight = d.getIntrinsicHeight();
-        int intrinsicWidth = d.getIntrinsicWidth();
-
-        int dwidth = intrinsicWidth;
-        int dheight = intrinsicHeight;
+        int dwidth = d.getIntrinsicWidth();
+        int dheight = d.getIntrinsicHeight();
         int vwidth = (int) target.width();
         int vheight = (int) target.height();
         float scaleX;
         float scaleY;
-
-        if (dwidth * vheight > vwidth * dheight) {//高超出
+        //高超出
+        if (dwidth * vheight > vwidth * dheight) {
             scaleY = (float) vheight / (float) dheight;
             scaleX = (float) vwidth / (float) dwidth;
-        } else {//宽超出
+        } else {
+            //宽超出
             scaleX = (float) vwidth / (float) dwidth;
             scaleY = (float) vheight / (float) dheight;
         }
@@ -151,11 +143,8 @@ public class PhotoViewAttacherCompat extends PhotoViewAttacher {
 
     public void fromFitCenterRectF(RectF target) {
         Drawable d = getImageView().getDrawable();
-        int intrinsicHeight = d.getIntrinsicHeight();
-        int intrinsicWidth = d.getIntrinsicWidth();
-
-        int dwidth = intrinsicHeight;
-        int dheight = intrinsicWidth;
+        int dwidth = d.getIntrinsicWidth();
+        int dheight = d.getIntrinsicHeight();
         int vwidth = (int) target.width();
         int vheight = (int) target.height();
         float scale;
@@ -181,11 +170,8 @@ public class PhotoViewAttacherCompat extends PhotoViewAttacher {
         if (imageView != null) {
             Drawable d = imageView.getDrawable();
             if (null != d) {
-                int intrinsicHeight = d.getIntrinsicHeight();
-                int intrinsicWidth = d.getIntrinsicWidth();
-
-                int dwidth = intrinsicHeight;
-                int dheight = intrinsicWidth;
+                int dwidth = d.getIntrinsicWidth();
+                int dheight = d.getIntrinsicHeight();
                 int vwidth = (int) target.width();
                 int vheight = (int) target.height();
 
@@ -239,11 +225,8 @@ public class PhotoViewAttacherCompat extends PhotoViewAttacher {
         if (imageView != null) {
             Drawable d = imageView.getDrawable();
             if (null != d) {
-                int intrinsicHeight = d.getIntrinsicHeight();
-                int intrinsicWidth = d.getIntrinsicWidth();
-
-                int dwidth = intrinsicWidth;
-                int dheight = intrinsicHeight;
+                int dwidth = d.getIntrinsicWidth();
+                int dheight = d.getIntrinsicHeight();
                 int vwidth = (int) target.width();
                 int vheight = (int) target.height();
                 float scaleX;
