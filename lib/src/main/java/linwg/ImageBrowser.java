@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -45,6 +44,7 @@ import uk.co.senab.photoview.PhotoView;
  * @date 2016/3/9
  */
 public class ImageBrowser extends Fragment {
+    public static int RESUME_ANIMATION_DURATION = 200;
     public static int ANIMATION_DURATION = 400;
     /**
      * The key of the {@link #mode}
@@ -192,14 +192,14 @@ public class ImageBrowser extends Fragment {
         contentView = inflater.inflate(R.layout.fragment_iamge_browser, null);
         initView(contentView);
         decorView = (ViewGroup) getActivity().getWindow().getDecorView();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int systemWindowInsetBottom = decorView.getRootWindowInsets().getSystemWindowInsetBottom();
-            if (systemWindowInsetBottom != 0 && rectFs != null) {
-                for (int i = 0; i < rectFs.length; i++) {
-                    rectFs[i].rectF.offset(0, -systemWindowInsetBottom / 2);
-                }
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            int systemWindowInsetBottom = decorView.getRootWindowInsets().getSystemWindowInsetBottom();
+//            if (systemWindowInsetBottom != 0 && rectFs != null) {
+//                for (int i = 0; i < rectFs.length; i++) {
+//                    rectFs[i].rectF.offset(0, -systemWindowInsetBottom / 2);
+//                }
+//            }
+//        }
         decorView.addView(contentView);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -230,12 +230,12 @@ public class ImageBrowser extends Fragment {
     /**
      * To make background shadow transparent.
      */
-    public void playDismissAnimation() {
+    public void playDismissAnimation(long duration) {
         ivCustom.setVisibility(View.GONE);
         ivDelete.setVisibility(View.GONE);
         ivDownLoad.setVisibility(View.GONE);
         tvCustom.setVisibility(View.GONE);
-        ObjectAnimator.ofFloat(shadowView, "alpha", 0.1f).setDuration(ANIMATION_DURATION).start();
+        ObjectAnimator.ofFloat(shadowView, "alpha", 0.1f).setDuration(duration).start();
     }
 
     private void initView(View view) {
@@ -535,6 +535,10 @@ public class ImageBrowser extends Fragment {
         if (mOnShowingClickListener != null) {
             mOnShowingClickListener.onShowing();
         }
+    }
+
+    public void setShadowAlpha(double targetScale) {
+        shadowView.setAlpha((float) targetScale);
     }
 
     public interface OnPhotoLongClickListener {
@@ -871,15 +875,19 @@ public class ImageBrowser extends Fragment {
     }
 
     public void dismiss() {
-        shadowView.animate().alpha(0).setDuration(250).start();
-        tvIndicator.animate().translationY(tvIndicator.getHeight()).setDuration(250).start();
-        tvTitle.animate().translationY(-tvTitle.getHeight()).setDuration(250).start();
-        circlePageIndicator.animate().translationY(circlePageIndicator.getHeight()).setDuration(250).start();
-        tvDescriptions.animate().alpha(0).setDuration(250).start();
+        dismiss(ImageBrowser.ANIMATION_DURATION);
+    }
+
+    public void dismiss(long duration) {
+        shadowView.animate().alpha(0).setDuration(duration).start();
+        tvIndicator.animate().translationY(tvIndicator.getHeight()).setDuration(duration).start();
+        tvTitle.animate().translationY(-tvTitle.getHeight()).setDuration(duration).start();
+        circlePageIndicator.animate().translationY(circlePageIndicator.getHeight()).setDuration(duration).start();
+        tvDescriptions.animate().alpha(0).setDuration(duration).start();
         if (mOnShowingClickListener != null) {
             mOnShowingClickListener.onChildChange(position);
         }
-        viewList.get(position).endAnimation();
+        viewList.get(position).endAnimation(duration);
     }
 
     protected void onDismiss() {

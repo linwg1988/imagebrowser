@@ -4,9 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.graphics.RectF;
-import android.support.v4.view.ViewCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -19,7 +17,6 @@ import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
- *
  * @author wengui
  * @date 2016/9/7
  */
@@ -79,7 +76,7 @@ public class WrapImageView {
         this.screenHeight = screenHeight;
         this.isStartTargetView = isStartView;
         this.targetView = targetView;
-        mProgressBar =  targetView.findViewById(R.id.pb_img_detail);
+        mProgressBar = targetView.findViewById(R.id.pb_img_detail);
         mProgressBar.setVisibility(View.GONE);
         this.url = url;
         this.thumbUrl = thumbUrl;
@@ -88,8 +85,8 @@ public class WrapImageView {
             origin = new RectF(screenWidth / 2, screenHeight / 2, screenWidth / 2, screenHeight / 2);
         }
         this.origin = origin;
-        this.thumbImageView =  targetView.findViewById(R.id.iv_thumbnail);
-        this.photoView =  targetView.findViewById(R.id.photo_view);
+        this.thumbImageView = targetView.findViewById(R.id.iv_thumbnail);
+        this.photoView = targetView.findViewById(R.id.photo_view);
         thumbWidth = thumbImageView.getLayoutParams().width;
 
         scale = thumbWidth / screenWidth;
@@ -108,6 +105,7 @@ public class WrapImageView {
                 return browser.onLongClick(WrapImageView.this);
             }
         });
+        photoView.setWrapper(this);
     }
 
     public void startLoading() {
@@ -149,50 +147,50 @@ public class WrapImageView {
      * after load whole image that if the whole image is already in cache and we can read it soon.
      * After the whole image display on photoView,this will cancel.
      */
-    private void startThumbAnimation() {
-        hasThumbPlaying = true;
-        if (isOriginMiss) {
-            ObjectAnimator alpha = ObjectAnimator.ofFloat(thumbImageView, "alpha", 0.5f, 1);
-            alpha.setDuration(ImageBrowser.ANIMATION_DURATION).start();
-            alpha.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressBar.setVisibility(View.VISIBLE);
-                }
-            });
-        } else {
-            ObjectAnimator scaleX = ObjectAnimator.ofFloat(thumbImageView, "scaleX", origin.width() / thumbWidth, 1f).setDuration(ImageBrowser.ANIMATION_DURATION);
-            ObjectAnimator scaleY = ObjectAnimator.ofFloat(thumbImageView, "scaleY", origin.height() / thumbWidth, 1f).setDuration(ImageBrowser.ANIMATION_DURATION);
-            ObjectAnimator translationX = ObjectAnimator.ofFloat(thumbImageView, "translationX", (origin.centerX() - screenWidth / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-            ObjectAnimator translationY = ObjectAnimator.ofFloat(thumbImageView, "translationY", (origin.centerY() - screenHeight / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-
-            AnimatorSet animatorSet = new AnimatorSet();
-            animatorSet.playTogether(scaleX, scaleY, translationX, translationY);
-            animatorSet.start();
-            translationX.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    if ((origin.centerX() - screenWidth / 2) == 0) {
-                        transX = 0;
-                    } else {
-                        transX = thumbImageView.getTranslationX() / (origin.centerX() - screenWidth / 2);
-                    }
-                    if ((origin.centerY() - screenHeight / 2) == 0) {
-                        transY = 0;
-                    } else {
-                        transY = thumbImageView.getTranslationY() / (origin.centerY() - screenHeight / 2);
-                    }
-                }
-            });
-            translationX.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressBar.setVisibility(View.VISIBLE);
-                }
-            });
-        }
-
-    }
+//    private void startThumbAnimation() {
+//        hasThumbPlaying = true;
+//        if (isOriginMiss) {
+//            ObjectAnimator alpha = ObjectAnimator.ofFloat(thumbImageView, "alpha", 0.5f, 1);
+//            alpha.setDuration(ImageBrowser.ANIMATION_DURATION).start();
+//            alpha.addListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    mProgressBar.setVisibility(View.VISIBLE);
+//                }
+//            });
+//        } else {
+//            ObjectAnimator scaleX = ObjectAnimator.ofFloat(thumbImageView, "scaleX", origin.width() / thumbWidth, 1f).setDuration(ImageBrowser.ANIMATION_DURATION);
+//            ObjectAnimator scaleY = ObjectAnimator.ofFloat(thumbImageView, "scaleY", origin.height() / thumbWidth, 1f).setDuration(ImageBrowser.ANIMATION_DURATION);
+//            ObjectAnimator translationX = ObjectAnimator.ofFloat(thumbImageView, "translationX", (origin.centerX() - screenWidth / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
+//            ObjectAnimator translationY = ObjectAnimator.ofFloat(thumbImageView, "translationY", (origin.centerY() - screenHeight / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
+//
+//            AnimatorSet animatorSet = new AnimatorSet();
+//            animatorSet.playTogether(scaleX, scaleY, translationX, translationY);
+//            animatorSet.start();
+//            translationX.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                @Override
+//                public void onAnimationUpdate(ValueAnimator animation) {
+//                    if ((origin.centerX() - screenWidth / 2) == 0) {
+//                        transX = 0;
+//                    } else {
+//                        transX = thumbImageView.getTranslationX() / (origin.centerX() - screenWidth / 2);
+//                    }
+//                    if ((origin.centerY() - screenHeight / 2) == 0) {
+//                        transY = 0;
+//                    } else {
+//                        transY = thumbImageView.getTranslationY() / (origin.centerY() - screenHeight / 2);
+//                    }
+//                }
+//            });
+//            translationX.addListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    mProgressBar.setVisibility(View.VISIBLE);
+//                }
+//            });
+//        }
+//
+//    }
 
     /**
      * The image has download completed,now we can play enterAnimation.
@@ -230,23 +228,25 @@ public class WrapImageView {
     }
 
     private void playFitCenterStartAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", transX * (origin.centerX() - screenWidth / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", transY * (origin.centerY() - screenHeight / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-        AnimatorSet animatorSet = new AnimatorSet();
         photoView.fromFitCenterRectF(origin);
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.start();
-        animatorSet.addListener(startAnimation);
+        photoView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mProgressBar.setVisibility(View.GONE);
+                photoView.resumeOnTouchEvent();
+            }
+        }, ImageBrowser.ANIMATION_DURATION);
     }
 
     private void playFitXYStartAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", transX * (origin.centerX() - screenWidth / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", transY * (origin.centerY() - screenHeight / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-        AnimatorSet animatorSet = new AnimatorSet();
         photoView.fromFitXYRectF(origin);
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.start();
-        animatorSet.addListener(startAnimation);
+        photoView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mProgressBar.setVisibility(View.GONE);
+                photoView.resumeOnTouchEvent();
+            }
+        }, ImageBrowser.ANIMATION_DURATION);
     }
 
     private void playDefaultStartAnimation() {
@@ -261,33 +261,39 @@ public class WrapImageView {
     }
 
     private void playCenterCropStartAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", transX * (origin.centerX() - screenWidth / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", transY * (origin.centerY() - screenHeight / 2), 0f).setDuration(ImageBrowser.ANIMATION_DURATION);
-        AnimatorSet animatorSet = new AnimatorSet();
         photoView.fromRectF(origin);
-        photoView.clipFrom(origin.width(), origin.height());
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.start();
-        animatorSet.addListener(new AnimatorListenerAdapter() {
+        photoView.clipFrom(origin);
+        photoView.postDelayed(new Runnable() {
             @Override
-            public void onAnimationEnd(Animator animation) {
+            public void run() {
                 mProgressBar.setVisibility(View.GONE);
                 photoView.resumeOnTouchEvent();
             }
-        });
+        }, ImageBrowser.ANIMATION_DURATION);
+    }
+
+    private void playCenterCropEndAnimation(long duration) {
+        photoView.toRectF(origin,duration);
+        photoView.clipTo(origin,duration);
+        photoView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mImageBrowser.onDismiss();
+            }
+        }, duration);
     }
 
     /**
      * Dismiss ImageBrowser with animation.
      */
-    void endAnimation() {
+    void endAnimation(long duration) {
         photoView.preventOnTouchEvent();
         if (!imageLoader.isDrawableLoadingCompleted(photoView)) {
-            endThumbAnimation();
+            endThumbAnimation(duration);
         } else {
-            endPhotoAnimation();
+            endPhotoAnimation(duration);
         }
-        mImageBrowser.playDismissAnimation();
+        mImageBrowser.playDismissAnimation(duration);
     }
 
     /**
@@ -297,85 +303,75 @@ public class WrapImageView {
      * and also play translation animation,otherwise we only play translation and scale animation assuming
      * that the origin ScaleType is CENTER_INSIDE.
      */
-    private void endPhotoAnimation() {
+    private void endPhotoAnimation(long duration) {
         if (isOriginMiss) {
-            ObjectAnimator alpha = ObjectAnimator.ofFloat(photoView, "alpha", 0).setDuration(ImageBrowser.ANIMATION_DURATION);
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(photoView, "alpha", 0).setDuration(duration);
             alpha.addListener(endAnimationListener);
             alpha.start();
         } else {
             switch (originScaleType) {
                 case CENTER_CROP:
-                    playCenterCropEndAnimation();
+                    playCenterCropEndAnimation(duration);
                     break;
                 case FIT_XY:
-                    playFitXYEndAnimation();
+                    playFitXYEndAnimation(duration);
                     break;
                 case FIT_CENTER:
                 case CENTER_INSIDE:
-                    playFitCenterEndAnimation();
+                    playFitCenterEndAnimation(duration);
                     break;
                 default:
-                    playDefaultEndAnimation();
+                    playDefaultEndAnimation(duration);
                     break;
             }
         }
     }
 
-    private void playFitCenterEndAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", origin.centerX() - screenWidth / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", origin.centerY() - screenHeight / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        AnimatorSet animatorSet = new AnimatorSet();
-        photoView.toFitCenterRectF(origin);
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.start();
-        animatorSet.addListener(endAnimationListener);
+    private void playFitCenterEndAnimation(long duration) {
+        photoView.toFitCenterRectF(origin,duration);
+        photoView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mImageBrowser.onDismiss();
+            }
+        }, duration);
     }
 
-    private void playDefaultEndAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", origin.centerX() - screenWidth / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", origin.centerY() - screenHeight / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
+    private void playDefaultEndAnimation(long duration) {
+        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", origin.centerX() - screenWidth / 2).setDuration(duration);
+        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", origin.centerY() - screenHeight / 2).setDuration(duration);
         AnimatorSet animatorSet = new AnimatorSet();
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(photoView, "scaleX", scale).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(photoView, "scaleY", scale).setDuration(ImageBrowser.ANIMATION_DURATION);
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(photoView, "scaleX", scale).setDuration(duration);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(photoView, "scaleY", scale).setDuration(duration);
         animatorSet.playTogether(scaleX, scaleY, translationX, translationY);
         animatorSet.start();
         animatorSet.addListener(endAnimationListener);
     }
 
-    private void playFitXYEndAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", origin.centerX() - screenWidth / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", origin.centerY() - screenHeight / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        AnimatorSet animatorSet = new AnimatorSet();
-        photoView.toFitXYRectF(origin);
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.start();
-        animatorSet.addListener(endAnimationListener);
-    }
-
-    private void playCenterCropEndAnimation() {
-        ObjectAnimator translationX = ObjectAnimator.ofFloat(photoView, "translationX", origin.centerX() - screenWidth / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        ObjectAnimator translationY = ObjectAnimator.ofFloat(photoView, "translationY", origin.centerY() - screenHeight / 2).setDuration(ImageBrowser.ANIMATION_DURATION);
-        AnimatorSet animatorSet = new AnimatorSet();
-        photoView.toRectF(origin);
-        animatorSet.playTogether(translationX, translationY);
-        animatorSet.start();
-        animatorSet.addListener(endAnimationListener);
+    private void playFitXYEndAnimation(long duration) {
+        photoView.toFitXYRectF(origin,duration);
+        photoView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mImageBrowser.onDismiss();
+            }
+        }, duration);
     }
 
     /**
      * If the image loader does not load the Image from net or cache yet,play thumb animation.
      * This animation just plays translation and scale.
      */
-    private void endThumbAnimation() {
+    private void endThumbAnimation(long duration) {
         if (isOriginMiss) {
-            ObjectAnimator alpha = ObjectAnimator.ofFloat(thumbImageView, "alpha", 0).setDuration(ImageBrowser.ANIMATION_DURATION);
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(thumbImageView, "alpha", 0).setDuration(duration);
             alpha.addListener(endAnimationListener);
             alpha.start();
         } else {
-            ObjectAnimator scaleX = ObjectAnimator.ofFloat(thumbImageView, "scaleX", origin.width() / thumbWidth).setDuration(ImageBrowser.ANIMATION_DURATION);
-            ObjectAnimator scaleY = ObjectAnimator.ofFloat(thumbImageView, "scaleY", origin.height() / thumbWidth).setDuration(ImageBrowser.ANIMATION_DURATION);
-            ObjectAnimator translationX = ObjectAnimator.ofFloat(thumbImageView, "translationX", origin.left - thumbOriginLeft).setDuration(ImageBrowser.ANIMATION_DURATION);
-            ObjectAnimator translationY = ObjectAnimator.ofFloat(thumbImageView, "translationY", origin.top - thumbOriginTop).setDuration(ImageBrowser.ANIMATION_DURATION);
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(thumbImageView, "scaleX", origin.width() / thumbWidth).setDuration(duration);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(thumbImageView, "scaleY", origin.height() / thumbWidth).setDuration(duration);
+            ObjectAnimator translationX = ObjectAnimator.ofFloat(thumbImageView, "translationX", origin.left - thumbOriginLeft).setDuration(duration);
+            ObjectAnimator translationY = ObjectAnimator.ofFloat(thumbImageView, "translationY", origin.top - thumbOriginTop).setDuration(duration);
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.playTogether(scaleX, scaleY, translationX, translationY);
             animatorSet.start();
@@ -389,5 +385,17 @@ public class WrapImageView {
 
     public void clean() {
         this.imageLoader = null;
+    }
+
+    public void callParentAlphaChange(double targetScale) {
+        mImageBrowser.setShadowAlpha(targetScale);
+    }
+
+    public void dismiss() {
+        mImageBrowser.dismiss();
+    }
+
+    public void dismiss(long duration) {
+        mImageBrowser.dismiss(duration);
     }
 }
