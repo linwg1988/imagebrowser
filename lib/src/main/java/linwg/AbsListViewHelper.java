@@ -1,5 +1,6 @@
 package linwg;
 
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,7 @@ class AbsListViewHelper {
             RectF lastChildRectF = getRectFByIndex(parent, viewCount - 1, imageViewId);
 //            float itemWidth = firstChildRectF.width() + Math.abs(viewRectFInfo.leftOffset) + Math.abs(viewRectFInfo.rightOffset);
 //            float itemHeight = firstChildRectF.height() + Math.abs(viewRectFInfo.topOffset) + Math.abs(viewRectFInfo.bottomOffset);
-            //TODO If parent is GridView ,the itemHeight should be calculate correct(Current is not correct really).
+            //If parent is GridView ,the itemHeight should be calculate correct(Current is not correct really).
             int lineCount = dataCount / numColumns + dataCount % numColumns == 0 ? 0 : 1;
             float itemWidth = Math.max(parent.getWidth() / numColumns, firstChildRectF.width() + Math.abs(viewRectFInfo.leftOffset) + Math.abs(viewRectFInfo.rightOffset));
             float itemHeight = Math.max(firstChildRectF.height() + Math.abs(viewRectFInfo.topOffset) + Math.abs(viewRectFInfo.bottomOffset), 0);
@@ -81,17 +82,14 @@ class AbsListViewHelper {
                 viewRectFInfo.imgLocations[i].scaleType = scaleType;
             }
             for (int i = firstVisiblePosition; i < lastVisiblePosition + 1; i++) {
-                int[] locate = new int[2];
                 final View child;
                 if (imageViewId != 0) {
                     child = parent.getChildAt(i - firstVisiblePosition).findViewById(imageViewId);
                 } else {
                     child = parent.getChildAt(i - firstVisiblePosition);
                 }
-                child.getLocationOnScreen(locate);
-                RectF rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
                 viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
-                viewRectFInfo.imgLocations[i].rectF = rectF;
+                viewRectFInfo.imgLocations[i].rectF = getRectByChildAndParent(parent, child);
                 viewRectFInfo.imgLocations[i].scaleType = scaleType;
             }
 
@@ -113,35 +111,42 @@ class AbsListViewHelper {
         } else {
             viewRectFInfo.imgLocations = new ImageRectFInfo[viewCount];
             for (int i = 0; i < viewCount; i++) {
-                int[] locate = new int[2];
+                final View child;
                 if (imageViewId != 0) {
-                    final View child = parent.getChildAt(i).findViewById(imageViewId);
-                    child.getLocationOnScreen(locate);
-                    viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
-                    viewRectFInfo.imgLocations[i].rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
-                    viewRectFInfo.imgLocations[i].scaleType = scaleType;
+                    child = parent.getChildAt(i).findViewById(imageViewId);
                 } else {
-                    final View child = parent.getChildAt(i);
-                    child.getLocationOnScreen(locate);
-                    viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
-                    viewRectFInfo.imgLocations[i].rectF = new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
-                    viewRectFInfo.imgLocations[i].scaleType = scaleType;
+                    child = parent.getChildAt(i);
                 }
+                viewRectFInfo.imgLocations[i] = new ImageRectFInfo();
+                viewRectFInfo.imgLocations[i].rectF = getRectByChildAndParent(parent, child);
+                viewRectFInfo.imgLocations[i].scaleType = scaleType;
             }
         }
         return viewRectFInfo;
     }
 
+    private static RectF getRectByChildAndParent(View parent, View child) {
+        Rect rect = new Rect();
+        child.getGlobalVisibleRect(rect);
+        if (rect.height() != child.getHeight()) {
+            if (child.getTop() < 0) {
+                rect.top = rect.bottom - child.getHeight();
+            }
+            if (child.getBottom() > parent.getHeight()) {
+                rect.bottom = rect.top + child.getHeight();
+            }
+        }
+        return new RectF(rect.left, rect.top, rect.right, rect.bottom);
+    }
+
     private static RectF getRectFByIndex(ViewGroup parent, int i, int imageViewId) {
-        int[] locate = new int[2];
         final View child;
         if (imageViewId != 0) {
             child = parent.getChildAt(i).findViewById(imageViewId);
         } else {
             child = parent.getChildAt(i);
         }
-        child.getLocationOnScreen(locate);
-        return new RectF(locate[0], locate[1], locate[0] + child.getWidth(), locate[1] + child.getHeight());
+        return getRectByChildAndParent(child, parent);
     }
 
     public static void performScrollToBottom(AbsListView parent, float offset, int position) {
@@ -154,6 +159,7 @@ class AbsListViewHelper {
 
     public static View findChildByPosition(AbsListView parent, int imageViewId, int position) {
         int firstVisiblePosition = parent.getFirstVisiblePosition();
-        return parent.getChildAt(position - firstVisiblePosition).findViewById(imageViewId);
+        View child = parent.getChildAt(position - firstVisiblePosition);
+        return child == null ? null : child.findViewById(imageViewId);
     }
 }

@@ -539,6 +539,9 @@ public class ImageBrowser extends Fragment {
 
     public void setShadowAlpha(double targetScale) {
         shadowView.setAlpha((float) targetScale);
+        if (mOnShowingClickListener != null) {
+            mOnShowingClickListener.onChildChange(position);
+        }
     }
 
     public interface OnPhotoLongClickListener {
@@ -668,7 +671,7 @@ public class ImageBrowser extends Fragment {
             return this;
         }
 
-        public Builder thumbSize(int thumbSize) {
+        private Builder thumbSize(int thumbSize) {
             this.thumbSize = thumbSize;
             return this;
         }
@@ -826,7 +829,9 @@ public class ImageBrowser extends Fragment {
         }
 
         void changeChild(int position) {
-            child.setAlpha(1);
+            if (child != null) {
+                child.setAlpha(1);
+            }
             child = findChild(position);
             if (child != null) {
                 child.setAlpha(0);
@@ -981,14 +986,6 @@ public class ImageBrowser extends Fragment {
         @Override
         public int getItemPosition(Object object) {
             return POSITION_NONE;
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        for (WrapImageView view : viewList) {
-            view.clean();
         }
     }
 }

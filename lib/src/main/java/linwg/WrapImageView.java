@@ -36,9 +36,8 @@ public class WrapImageView {
     private final float thumbOriginTop;
     private final ProgressBar mProgressBar;
     View targetView;
-    private boolean hasThumbPlaying;
     private boolean hasPhotoPlaying;
-    ImageView.ScaleType originScaleType = ImageView.ScaleType.MATRIX;
+    ImageView.ScaleType originScaleType;
     boolean isOriginMiss;
     ImageBrowser mImageBrowser;
     Animator.AnimatorListener endAnimationListener = new Animator.AnimatorListener() {
@@ -109,10 +108,6 @@ public class WrapImageView {
     }
 
     public void startLoading() {
-//        if (!isOriginMiss) {
-//            thumbImageView.setScaleType(originScaleType);
-//        }
-//        startPhotoAnimation();
         imageLoader.loadImage(targetView.getContext(), url, photoView, new IResourceReadyCallback() {
             @Override
             public void onResourceReady() {
@@ -125,28 +120,17 @@ public class WrapImageView {
             }
         });
 
-//        IResourceReadyCallback thumbCallback = new IResourceReadyCallback() {
-//            @Override
-//            public void onResourceReady() {
-//                if (!hasThumbPlaying && isStartTargetView && !hasPhotoPlaying) {
-//                    startThumbAnimation();
-//                }
-//            }
-//        };
-//        if (!imageLoader.loadThumb(targetView.getContext(), url, thumbUrl, thumbImageView, thumbCallback)) {
-//            imageLoader.loadImage(targetView.getContext(), thumbUrl, thumbImageView, thumbCallback);
-//        }
     }
 
     float transX = 1;
     float transY = 1;
 
-    /**
-     * The thumb image has download completed,now we can play enterAnimation.
-     * Usually thumb image is display faster than whole image,so we call loadThumb by imageLoader
-     * after load whole image that if the whole image is already in cache and we can read it soon.
-     * After the whole image display on photoView,this will cancel.
-     */
+//    /**
+//     * The thumb image has download completed,now we can play enterAnimation.
+//     * Usually thumb image is display faster than whole image,so we call loadThumb by imageLoader
+//     * after load whole image that if the whole image is already in cache and we can read it soon.
+//     * After the whole image display on photoView,this will cancel.
+//     */
 //    private void startThumbAnimation() {
 //        hasThumbPlaying = true;
 //        if (isOriginMiss) {
@@ -383,16 +367,8 @@ public class WrapImageView {
         return photoView;
     }
 
-    public void clean() {
-        this.imageLoader = null;
-    }
-
     public void callParentAlphaChange(double targetScale) {
         mImageBrowser.setShadowAlpha(targetScale);
-    }
-
-    public void dismiss() {
-        mImageBrowser.dismiss();
     }
 
     public void dismiss(long duration) {

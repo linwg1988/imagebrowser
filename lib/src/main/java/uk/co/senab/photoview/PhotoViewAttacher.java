@@ -357,7 +357,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
             if (!mScaleDragDetector.isScaling() && ((getScale() == 1 && notFreeDrag) || !notFreeDrag)) {
                 float translationY = Math.abs(getTranslationY());
-                double targetScale = (getImageView().getHeight() - translationY) / getImageView().getHeight() * 0.3f + 0.7;
+                double targetScale = (getImageView().getHeight() - translationY) / getImageView().getHeight() * 0.5f + 0.5;
                 float scale = getScale();
                 float v = (float) (targetScale / scale);
                 mSuppMatrix.postTranslate(-dx * 0.8f, 0);
@@ -365,10 +365,8 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
                 ((PhotoView) getImageView()).callParentAlphaChange(targetScale);
                 notFreeDrag = false;
                 checkAndDisplayMatrixByDrag();
-                Log.e("=====", "checkAndDisplayMatrixByDrag" + targetScale);
             } else {
                 checkAndDisplayMatrix();
-                Log.e("=====", "checkAndDisplayMatrix");
             }
 
             /**
@@ -401,12 +399,11 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         ImageView imageView = getImageView();
         if (hasDrawable(imageView)) {
             if (canFlingToDismiss) {
-                if (Math.abs(velocityY) > 10000) {
-                    fastFlingAndDismiss(startX, startY, velocityX, velocityY);
+                if (Math.abs(velocityY) > 5000) {
+                    fastFlingAndDismiss(velocityX, velocityY);
                 }
                 canFlingToDismiss = false;
             } else {
-                Log.e(LOG_TAG, "FlingRunnable");
                 mCurrentFlingRunnable = new FlingRunnable(imageView.getContext());
                 mCurrentFlingRunnable.fling(imageView.getWidth(),
                         imageView.getHeight(), (int) velocityX, (int) velocityY);
@@ -415,7 +412,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         }
     }
 
-    private void fastFlingAndDismiss(float startX, float startY, float velocityX,
+    private void fastFlingAndDismiss(float velocityX,
                                      float velocityY) {
         if (resumeAnimator != null) {
             resumeAnimator.valueAnimator.cancel();
@@ -435,7 +432,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         }
         startTranX = getTranslationX();
         starTranY = getTranslationY();
-        Log.e(LOG_TAG, "fastFlingAndDismiss" + distanceX + "=========" + distanceY);
+
         ValueAnimator valueAnimator = ValueAnimator.ofInt(0, ImageBrowser.RESUME_ANIMATION_DURATION);
         valueAnimator.setDuration(ImageBrowser.RESUME_ANIMATION_DURATION);
         valueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -451,7 +448,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
                 mSuppMatrix.postTranslate(targetTranX - (translationX - startTranX), targetTranY - (translationY - starTranY));
 
                 translationY = Math.abs(translationY);
-                double targetScale = (getImageView().getHeight() - translationY) / getImageView().getHeight() * 0.3f + 0.7;
+                double targetScale = (getImageView().getHeight() - translationY) / getImageView().getHeight() * 0.5f + 0.5;
                 float scale = getScale();
                 float v = (float) (targetScale / scale);
                 mSuppMatrix.postScale(v, v, touchX, touchY);
@@ -575,7 +572,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
                         int originBottom = originTop + drawable.getIntrinsicHeight();
                         RectF rect = getDisplayRect();
                         if (null != rect) {
-                            if (rect.top - originTop > getImageView().getHeight() / 2 || originBottom - rect.bottom > getImageView().getHeight() / 2) {
+                            if (rect.top - originTop > getImageView().getHeight() / 3 || originBottom - rect.bottom > getImageView().getHeight() / 3) {
                                 ((PhotoView) getImageView()).dismiss(ImageBrowser.RESUME_ANIMATION_DURATION);
                             } else {
                                 canFlingToDismiss = true;
@@ -1029,7 +1026,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
                     mSuppMatrix.postTranslate(targetTranX - nowTranslationX, targetTranY - nowTranslationY);
                     mSuppMatrix.postScale(targetScale / nowScale, targetScale / nowScale);
                     ((PhotoView) getImageView()).callParentAlphaChange(targetScale);
-                    Log.e(LOG_TAG, "ResumeAnimatorUpdate");
                     checkAndDisplayMatrixByDrag();
                 }
             });
@@ -1169,59 +1165,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
                 // Post On animation
                 Compat.postOnAnimation(imageView, this);
-            }
-        }
-    }
-
-    private class FlingToDismissRunnable implements Runnable {
-
-        private final OverScroller mScroller;
-        private int mCurrentX, mCurrentY;
-
-        public FlingToDismissRunnable(Context context) {
-            mScroller = new OverScroller(context);
-        }
-
-        public void cancelFling() {
-            mScroller.forceFinished(true);
-        }
-
-        public void fling(int viewWidth, int viewHeight, int velocityX,
-                          int velocityY) {
-            final RectF rect = getDisplayRect();
-            if (null == rect) {
-                return;
-            }
-
-            final int startX = Math.round(-rect.left);
-            final int startY = Math.round(-rect.top);
-            mCurrentX = startX;
-            mCurrentY = startY;
-            // If we actually can move, fling the scroller
-            mScroller.fling(startX, startY, velocityX, velocityY, -10000,
-                    10000, -10000, 100000, 0, 0);
-        }
-
-        @Override
-        public void run() {
-            ImageView imageView = getImageView();
-            if (null != imageView && mScroller.computeScrollOffset()) {
-
-                final int newX = mScroller.getCurrX();
-                final int newY = mScroller.getCurrY();
-                mSuppMatrix.postTranslate(mCurrentX - newX, mCurrentY - newY);
-                float translationY = Math.abs(getTranslationY());
-                double targetScale = (getImageView().getHeight() - translationY) / getImageView().getHeight() * 0.3f + 0.7;
-                float scale = getScale();
-                float v = (float) (targetScale / scale);
-                mSuppMatrix.postScale(v, v, touchX, touchY);
-                setImageViewMatrix(getDisplayMatrix());
-                mCurrentX = newX;
-                mCurrentY = newY;
-                // Post On animation
-                Compat.postOnAnimation(imageView, this);
-            } else if (mScroller.isFinished()) {
-                ((PhotoView) getImageView()).dismiss(ImageBrowser.RESUME_ANIMATION_DURATION);
             }
         }
     }

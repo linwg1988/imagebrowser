@@ -1,13 +1,13 @@
 # imagebrowser
 
-这是一款图片浏览器.</br>
+这是一款图片浏览器.[demo.apk](https://github.com/linwg1988/imagebrowser/files/app-debug.apk)</br>
 想要方便自己app中点击浏览大图。<br>
 
 gradled中的引用：
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.2.3'
+    compile 'org.linwg1988:imagebrowser:1.2.4'
 }
 ~~~
 支持图片列表类型为RecyclerView，ListView和GridView。在相对复杂的列表子项中提供ImageView的id配置，<br>
@@ -111,18 +111,21 @@ new ImageBrowser.Builder(MainActivity.this)
 Gradle版本升级到4.1.1, Glide版本到4.9.0<br>
 #1.2.1
 简化单张图片点击浏览的api，只需要设置url以及target即可.<br>
+~~~Java
+new ImageBrowser.Builder(MainActivity.this).urls(url).target(v).show();
+~~~
 #1.2.2
 修复RecycleView的直接itemView不是ImageView时解析图片位置的错误，修复RecycleView动画位置异常的bug，去除缩略图动画，使初始动画更加平滑.<br>
 因为去除了缩略图占位，所以加载原图是网络大图时可能比较慢，除非该图片原图已经在本地缓存已经存在.<br>
 #1.2.3
 修复动画初始取值错误的问题<br>
+#1.2.4
+优化关闭动画，避免图片跳动，支持上下滑动关闭，修改GridView初始化图片位置的取值方式
 
 最后上一下效果图：<br>
-![](http://ofj4ai6ke.bkt.clouddn.com/local.gif)<br>
-这是加载本地图片的时候<br>
 
-![](http://ofj4ai6ke.bkt.clouddn.com/net.gif)<br>
-这是加载网络图片的时候的效果<br>
+![](https://github.com/linwg1988/imagebrowser/files/show.gif)<br>
+
 
 
 

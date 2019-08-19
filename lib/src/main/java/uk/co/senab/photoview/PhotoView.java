@@ -37,6 +37,7 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
 
     private ScaleType mPendingScaleType;
     private WrapImageView wrapper;
+    RectF rect;
 
     public PhotoView(Context context) {
         this(context, null);
@@ -112,8 +113,10 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
         mAttacher.setMaxScale(maxScale);
     }
 
+    /**
+     * setImageBitmap calls through to this method
+     */
     @Override
-    // setImageBitmap calls through to this method
     public void setImageDrawable(Drawable drawable) {
         super.setImageDrawable(drawable);
         if (null != mAttacher) {
@@ -183,16 +186,16 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
         super.onDetachedFromWindow();
     }
 
-    public void toRectF(RectF rectF,long duration) {
-        mAttacher.toRectF(rectF,duration);
+    public void toRectF(RectF rectF, long duration) {
+        mAttacher.toRectF(rectF, duration);
     }
 
-    public void toFitXYRectF(RectF rectF,long duration) {
-        mAttacher.toFitXYRectF(rectF,duration);
+    public void toFitXYRectF(RectF rectF, long duration) {
+        mAttacher.toFitXYRectF(rectF, duration);
     }
 
-    public void toFitCenterRectF(RectF rectF,long duration) {
-        mAttacher.toFitCenterRectF(rectF,duration);
+    public void toFitCenterRectF(RectF rectF, long duration) {
+        mAttacher.toFitCenterRectF(rectF, duration);
     }
 
     public void fromRectF(RectF rectF) {
@@ -212,11 +215,7 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
         Drawable drawable = getDrawable();
         Matrix imageMatrix = getImageMatrix();
         int paddingLeft = getPaddingLeft();
-        int paddingRight = getPaddingRight();
         int paddingTop = getPaddingTop();
-        int paddingBottom = getPaddingBottom();
-        int scrollX = getScrollX();
-        int scrollY = getScrollY();
 
         if (drawable == null) {
             return;
@@ -231,7 +230,6 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
                 canvas.clipRect(rect);
             }
 
-
             canvas.translate(paddingLeft, paddingTop);
             if (imageMatrix != null) {
                 canvas.concat(imageMatrix);
@@ -239,60 +237,6 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
             drawable.draw(canvas);
             canvas.restoreToCount(saveCount);
         }
-    }
-
-    RectF rect;
-
-    public void clipTo(final int width, final int height,final long duration) {
-        final int vWidth = getWidth();
-        final int vHeight = getHeight();
-        rect = new RectF();
-        rect.right = vWidth;
-        rect.bottom = vHeight;
-        final int widthOffset = (vWidth - width) / 2;
-        final int heightOffset = (vHeight - height) / 2;
-
-
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1).setDuration(duration);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float f = (float) animation.getAnimatedValue();
-                rect.left = (int) (widthOffset * f);
-                rect.top = (int) (heightOffset * f);
-                rect.right = vWidth - rect.left;
-                rect.bottom = vHeight - rect.top;
-                invalidate();
-            }
-        });
-        valueAnimator.start();
-    }
-
-    public void clipFrom(final float width, final float height) {
-        final int vWidth = getWidth();
-        final int vHeight = getHeight();
-        rect = new RectF();
-        rect.left = (vWidth - width) / 2;
-        rect.right = rect.left + width;
-        rect.top = (vHeight - height) / 2;
-        rect.bottom = rect.top + height;
-        final float widthOffset = (vWidth - width) / 2;
-        final float heightOffset = (vHeight - height) / 2;
-
-
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1).setDuration(ImageBrowser.ANIMATION_DURATION);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float f = (float) animation.getAnimatedValue();
-                rect.left -= (int) (widthOffset * f);
-                rect.top -= (int) (heightOffset * f);
-                rect.right += (widthOffset * f);
-                rect.bottom += (heightOffset * f);
-                invalidate();
-            }
-        });
-        valueAnimator.start();
     }
 
     public void clipFrom(final RectF target) {
@@ -320,7 +264,7 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
         valueAnimator.start();
     }
 
-    public void clipTo(RectF origin,long duration) {
+    public void clipTo(RectF origin, long duration) {
         final int vWidth = getWidth() + Math.abs((int) mAttacher.getTranslationX()) * 2;
         final int vHeight = getHeight() + Math.abs((int) mAttacher.getTranslationY()) * 2;
         rect = new RectF();
@@ -361,10 +305,6 @@ public class PhotoView extends AppCompatImageView implements IPhotoView {
 
     public void setWrapper(WrapImageView wrapImageView) {
         this.wrapper = wrapImageView;
-    }
-
-    public void dismiss() {
-        wrapper.dismiss();
     }
 
     public void dismiss(long duration) {
