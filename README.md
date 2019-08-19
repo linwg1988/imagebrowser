@@ -1,6 +1,6 @@
 # imagebrowser
 
-这是一款图片浏览器.[demo.apk](https://github.com/linwg1988/imagebrowser/files/app-debug.apk)</br>
+这是一款图片浏览器.[demo.apk](https://github.com/linwg1988/imagebrowser/blob/master/files/app-debug.apk)</br>
 想要方便自己app中点击浏览大图。<br>
 
 gradled中的引用：
@@ -124,7 +124,7 @@ new ImageBrowser.Builder(MainActivity.this).urls(url).target(v).show();
 
 最后上一下效果图：<br>
 
-![](https://github.com/linwg1988/imagebrowser/files/show.gif)<br>
+![](https://github.com/linwg1988/imagebrowser/blob/master/files/show.gif)<br>
 
 
 
