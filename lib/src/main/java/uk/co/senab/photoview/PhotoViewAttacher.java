@@ -35,7 +35,6 @@ import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.OverScroller;
 
 import java.lang.ref.WeakReference;
 
@@ -366,6 +365,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
                 notFreeDrag = false;
                 checkAndDisplayMatrixByDrag();
             } else {
+                notFreeDrag = true;
                 checkAndDisplayMatrix();
             }
 
@@ -506,6 +506,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         if (hasDrawable(getImageView())
                 && (getScale() < mMaxScale || scaleFactor < 1f)) {
             mSuppMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
+            notFreeDrag = true;
             checkAndDisplayMatrix();
         }
     }
