@@ -160,6 +160,11 @@ class RecyclerViewHelper {
     }
 
     public static View findChildByPosition(RecyclerView parent, int imageViewId, int position) {
-        return parent.getLayoutManager().findViewByPosition(position).findViewById(imageViewId);
+        RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+        if (layoutManager == null) {
+            return null;
+        }
+        View view = layoutManager.findViewByPosition(position);
+        return view == null ? null : view.findViewById(imageViewId);
     }
 }

@@ -314,7 +314,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
     @Override
     public final boolean onDoubleTap(MotionEvent ev) {
-        Log.e(LOG_TAG, "onDoubleTap");
         try {
             float scale = getScale();
             float x = ev.getX();
@@ -348,7 +347,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         if (DEBUG) {
             Log.d(LOG_TAG, String.format("onDrag: dx: %.2f. dy: %.2f", dx, dy));
         }
-        Log.e(LOG_TAG, "onDrag");
         ImageView imageView = getImageView();
 
         if (hasDrawable(imageView)) {
@@ -502,7 +500,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
     @Override
     public final void onScale(float scaleFactor, float focusX, float focusY) {
-        Log.e(LOG_TAG, "onScale");
         if (hasDrawable(getImageView())
                 && (getScale() < mMaxScale || scaleFactor < 1f)) {
             mSuppMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
@@ -514,7 +511,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
     @Override
     public final boolean onSingleTapConfirmed(MotionEvent e) {
         ImageView imageView = getImageView();
-        Log.e(LOG_TAG, "onSingleTapConfirmed");
         if (null != imageView) {
             if (null != mPhotoTapListener) {
                 final RectF displayRect = getDisplayRect();
@@ -618,7 +614,6 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
     ResumeAnimator resumeAnimator;
 
     private void resume() {
-        Log.e(LOG_TAG, "resume");
         resumeAnimator = new ResumeAnimator(getScale(), 1, getTranslationX(), getTranslationY());
         resumeAnimator.start();
     }

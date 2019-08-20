@@ -7,7 +7,7 @@ gradled中的引用：
 ~~~Java
 gradle:
 dependencies {
-    compile 'org.linwg1988:imagebrowser:1.2.5'
+    compile 'org.linwg1988:imagebrowser:1.2.6'
 }
 ~~~
 支持图片列表类型为RecyclerView，ListView和GridView。在相对复杂的列表子项中提供ImageView的id配置，<br>
