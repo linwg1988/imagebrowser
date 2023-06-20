@@ -2,9 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ImageBrowser.iml" filepath="$PROJECT_DIR$/ImageBrowser.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/imagebrowser.iml" filepath="$PROJECT_DIR$/.idea/modules/imagebrowser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/imagebrowser.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.iml" filepath="$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/lib/imagebrowser.lib.unitTest.iml" />
     </modules>
   </component>
 </project>

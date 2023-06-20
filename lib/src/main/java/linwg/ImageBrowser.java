@@ -1,22 +1,11 @@
 package linwg;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -28,6 +17,18 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,7 +134,7 @@ public class ImageBrowser extends Fragment {
      */
     private int mode = Mode.NONE;
 
-    private ArrayList<WrapImageView> viewList = new ArrayList<>();
+    private final ArrayList<WrapImageView> viewList = new ArrayList<>();
 
     private ImageView ivDownLoad;
     private ImagePagerAdapter imagePagerAdapter;
@@ -151,10 +152,12 @@ public class ImageBrowser extends Fragment {
     private OnShowingClickListener mOnShowingClickListener;
 
 
+    @SuppressLint("InflateParams")
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        FragmentActivity activity = requireActivity();
         if (savedInstanceState != null) {
             mode = savedInstanceState.getInt(IB_MODE);
             thumbSize = savedInstanceState.getInt(IB_THUMB_SIZE);
@@ -170,36 +173,30 @@ public class ImageBrowser extends Fragment {
             showTitle = savedInstanceState.getBoolean(IB_SHOW_TITLE);
         } else {
             final Bundle arguments = getArguments();
-            mode = arguments.getInt(IB_MODE);
-            thumbSize = arguments.getInt(IB_THUMB_SIZE);
-            imageUrls = arguments.getStringArrayList(IB_URLS);
-            viewDescriptios = arguments.getStringArrayList(IB_DES);
-            position = arguments.getInt(IB_POSITION);
-            thumbUrls = arguments.getStringArrayList(IB_THUMB_URLS);
-            rectFs = (ImageRectFInfo[]) arguments.getParcelableArray(IB_LOCATIONS);
-            customImgRes = arguments.getInt(IB_CUSTOM_IMG_RES);
-            customTextRes = arguments.getInt(IB_CUSTOM_TEXT_RES);
-            customChar = arguments.getCharSequence(IB_CUSTOM_TEXT);
-            scaleTypeName = arguments.getString(IMG_SCALE_TYPE);
-            showTitle = arguments.getBoolean(IB_SHOW_TITLE);
+            if (arguments != null) {
+                mode = arguments.getInt(IB_MODE);
+                thumbSize = arguments.getInt(IB_THUMB_SIZE);
+                imageUrls = arguments.getStringArrayList(IB_URLS);
+                viewDescriptios = arguments.getStringArrayList(IB_DES);
+                position = arguments.getInt(IB_POSITION);
+                thumbUrls = arguments.getStringArrayList(IB_THUMB_URLS);
+                rectFs = (ImageRectFInfo[]) arguments.getParcelableArray(IB_LOCATIONS);
+                customImgRes = arguments.getInt(IB_CUSTOM_IMG_RES);
+                customTextRes = arguments.getInt(IB_CUSTOM_TEXT_RES);
+                customChar = arguments.getCharSequence(IB_CUSTOM_TEXT);
+                scaleTypeName = arguments.getString(IMG_SCALE_TYPE);
+                showTitle = arguments.getBoolean(IB_SHOW_TITLE);
+            }
         }
         if (thumbSize == 0) {
-            thumbSize = (int) Util.dp2px(getActivity(), DEFAULT_THUMB_SIZE);
+            thumbSize = (int) Util.dp2px(activity, DEFAULT_THUMB_SIZE);
         }
-        screenWidth = Util.getScreenWidth(getActivity());
-        screenHeight = Util.getScreenHeight(getActivity());
+        screenWidth = Util.getScreenWidth(activity);
+        screenHeight = Util.getScreenHeight(activity);
 
         contentView = inflater.inflate(R.layout.fragment_iamge_browser, null);
         initView(contentView);
-        decorView = (ViewGroup) getActivity().getWindow().getDecorView();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            int systemWindowInsetBottom = decorView.getRootWindowInsets().getSystemWindowInsetBottom();
-//            if (systemWindowInsetBottom != 0 && rectFs != null) {
-//                for (int i = 0; i < rectFs.length; i++) {
-//                    rectFs[i].rectF.offset(0, -systemWindowInsetBottom / 2);
-//                }
-//            }
-//        }
+        decorView = (ViewGroup) activity.getWindow().getDecorView();
         decorView.addView(contentView);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -211,7 +208,7 @@ public class ImageBrowser extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(IB_URLS, imageUrls);
         outState.putStringArrayList(IB_DES, viewDescriptios);
@@ -239,6 +236,7 @@ public class ImageBrowser extends Fragment {
     }
 
     private void initView(View view) {
+        FragmentActivity activity = requireActivity();
         shadowView = view.findViewById(R.id.shadow);
         ivDownLoad = view.findViewById(R.id.ivDownLoad);
         ivDelete = view.findViewById(R.id.ivDelete);
@@ -267,13 +265,11 @@ public class ImageBrowser extends Fragment {
             tvTitle.setVisibility(View.GONE);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            int top = dp2px(getActivity(), 25);
-            ViewGroup.LayoutParams lp = tvTitle.getLayoutParams();
-            lp.height += top;
-            tvTitle.setPadding(0, top, 0, 0);
-            tvTitle.requestLayout();
-        }
+        int top = dp2px(activity, 25);
+        ViewGroup.LayoutParams lp = tvTitle.getLayoutParams();
+        lp.height += top;
+        tvTitle.setPadding(0, top, 0, 0);
+        tvTitle.requestLayout();
 
         if (viewDescriptios != null && viewDescriptios.size() > 0) {
             tvDescriptions.setVisibility(View.VISIBLE);
@@ -294,10 +290,10 @@ public class ImageBrowser extends Fragment {
         }
 
         String c = String.valueOf(position + 1);
-        String all = c + "/" + String.valueOf(imageUrls.size());
+        String all = c + "/" + imageUrls.size();
         SpannableStringBuilder sb = new SpannableStringBuilder(all);
         tvIndicator.setText(all);
-        int px = sp2px(getActivity(), 10);
+        int px = sp2px(activity, 10);
         sb.setSpan(new AbsoluteSizeSpan(px), c.length(), all.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.append("  ");
         sb.append(getDes(position));
@@ -310,10 +306,10 @@ public class ImageBrowser extends Fragment {
             public void onPageSelected(final int position) {
                 tvTitle.setText(getDes(position));
                 String c = String.valueOf(position + 1);
-                String all = c + "/" + String.valueOf(imageUrls.size());
+                String all = c + "/" + imageUrls.size();
                 SpannableStringBuilder sb = new SpannableStringBuilder(all);
                 tvIndicator.setText(all);
-                int px = sp2px(getActivity(), 10);
+                int px = sp2px(activity, 10);
                 sb.setSpan(new AbsoluteSizeSpan(px), c.length(), all.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 sb.append("  ");
                 sb.append(getDes(position));
@@ -327,15 +323,15 @@ public class ImageBrowser extends Fragment {
                     RectF parentRectF = new RectF(parentLocation[0], parentLocation[1], parentLocation[0] + builder.parent.getWidth(), parentLocation[1] + builder.parent.getHeight());
                     if (rectF.bottom > parentRectF.bottom) {
                         float offset = rectF.bottom + builder.viewRectFInfo.bottomOffset - parentRectF.bottom;
-                        for (int i = 0; i < rectFs.length; i++) {
-                            rectFs[i].rectF.offset(0, -offset);
+                        for (ImageRectFInfo f : rectFs) {
+                            f.rectF.offset(0, -offset);
                         }
                         performScrollToBottom(builder.parent, offset, position);
                     }
                     if (rectF.top < parentRectF.top) {
                         float offset = parentRectF.top - builder.viewRectFInfo.topOffset - rectF.top;
-                        for (int i = 0; i < rectFs.length; i++) {
-                            rectFs[i].rectF.offset(0, offset);
+                        for (ImageRectFInfo f : rectFs) {
+                            f.rectF.offset(0, offset);
                         }
                         performScrollToTop(builder.parent, offset, position);
                     }
@@ -357,7 +353,7 @@ public class ImageBrowser extends Fragment {
     private void fillingViewList() {
         viewList.clear();
         for (int i = 0; i < imageUrls.size(); i++) {
-            View imageLayout = getActivity().getLayoutInflater().inflate(R.layout.item_image_browser, null);
+            @SuppressLint("InflateParams") View imageLayout = requireActivity().getLayoutInflater().inflate(R.layout.item_image_browser, null);
             final View ivThumbnail = imageLayout.findViewById(R.id.iv_thumbnail);
             final ViewGroup.LayoutParams params = ivThumbnail.getLayoutParams();
             //init thumb size of thumb imageView
@@ -402,40 +398,28 @@ public class ImageBrowser extends Fragment {
                 break;
             case Mode.DELETE:
                 ivDelete.setVisibility(View.VISIBLE);
-                ivDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mOnDeleteClickListener != null) {
-                            new AlertDialog.Builder(getActivity()).setTitle(R.string.delete_alert)
-                                    .setMessage(R.string.delete_message).setPositiveButton(R.string.sure, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                ivDelete.setOnClickListener(v -> {
+                    if (mOnDeleteClickListener != null) {
+                        new AlertDialog.Builder(requireActivity()).setTitle(R.string.delete_alert)
+                                .setMessage(R.string.delete_message).setPositiveButton(R.string.sure, (dialog, which) -> {
                                     removeCurrent();
                                     if (imageUrls.size() == 0) {
                                         ImageBrowser.this.dismissWithoutAnimation();
                                     }
                                     dialog.cancel();
-                                }
-                            }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
 
-                                }
-                            }).create().show();
-                        }
+                                }).create().show();
                     }
                 });
                 break;
             case Mode.DOWNLOAD:
                 ivDownLoad.setVisibility(View.VISIBLE);
-                ivDownLoad.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mOnDownloadClickListener != null) {
-                            final PhotoView view = viewList.get(position).getPhotoView();
-                            if (ImageLoaderFactory.get().isDrawableLoadingCompleted(view)) {
-                                mOnDownloadClickListener.onDownloadBtnClick(ImageLoaderFactory.get().getBitmapFromImageView(view));
-                            }
+                ivDownLoad.setOnClickListener(v -> {
+                    if (mOnDownloadClickListener != null) {
+                        final PhotoView view = viewList.get(position).getPhotoView();
+                        if (ImageLoaderFactory.get().isDrawableLoadingCompleted(view)) {
+                            mOnDownloadClickListener.onDownloadBtnClick(ImageLoaderFactory.get().getBitmapFromImageView(view));
                         }
                     }
                 });
@@ -445,16 +429,13 @@ public class ImageBrowser extends Fragment {
     }
 
     public void setIndicatorPaddingBottom(final int paddingBottom) {
-        circlePageIndicator.post(new Runnable() {
-            @Override
-            public void run() {
-                int dp6 = (int) Util.dp2px(getActivity(), 6);
-                int dp12 = dp6 * 2;
-                circlePageIndicator.setPadding(0, 0, 0, paddingBottom);
-                tvDescriptions.setPadding(0, 0, 0, paddingBottom);
-                tvDescriptions.setPadding(dp12, dp12, dp12, dp12 + paddingBottom);
-                tvIndicator.setPadding(dp6, dp6, dp6, dp6 + paddingBottom);
-            }
+        circlePageIndicator.post(() -> {
+            int dp6 = (int) Util.dp2px(requireActivity(), 6);
+            int dp12 = dp6 * 2;
+            circlePageIndicator.setPadding(0, 0, 0, paddingBottom);
+            tvDescriptions.setPadding(0, 0, 0, paddingBottom);
+            tvDescriptions.setPadding(dp12, dp12, dp12, dp12 + paddingBottom);
+            tvIndicator.setPadding(dp6, dp6, dp6, dp6 + paddingBottom);
         });
     }
 
@@ -477,11 +458,11 @@ public class ImageBrowser extends Fragment {
     }
 
     public static int dp2px(Context context, float dpVal) {
-        return (int) TypedValue.applyDimension(1, dpVal, context.getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpVal, context.getResources().getDisplayMetrics());
     }
 
     public static int sp2px(Context context, float spVal) {
-        return (int) TypedValue.applyDimension(2, spVal, context.getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spVal, context.getResources().getDisplayMetrics());
     }
 
     private String getDes(int position) {
@@ -505,7 +486,7 @@ public class ImageBrowser extends Fragment {
     public static boolean onBackPressed(FragmentActivity activity) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(TAG);
-        if (fragment != null && fragment instanceof ImageBrowser) {
+        if (fragment instanceof ImageBrowser) {
             return ((ImageBrowser) fragment).onBackPressed();
         }
         return false;
@@ -961,7 +942,7 @@ public class ImageBrowser extends Fragment {
     private class ImagePagerAdapter extends PagerAdapter {
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
             container.removeView(((WrapImageView) object).targetView);
         }
 
@@ -970,6 +951,7 @@ public class ImageBrowser extends Fragment {
             return imageUrls.size();
         }
 
+        @NonNull
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             WrapImageView view = viewList.get(position);
@@ -979,12 +961,12 @@ public class ImageBrowser extends Fragment {
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
             return view == ((WrapImageView) object).targetView;
         }
 
         @Override
-        public int getItemPosition(Object object) {
+        public int getItemPosition(@NonNull Object object) {
             return POSITION_NONE;
         }
     }
